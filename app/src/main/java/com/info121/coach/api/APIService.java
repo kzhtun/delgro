@@ -23,6 +23,21 @@ public interface APIService {
     @GET("getFutureJobsList/{date},{passenger},{sort}")
     Call<JobRes> GetFutureJobs(@Path("date") String date, @Path("passenger") String passenger, @Path("sort") String sort);
 
+    @GET("getHistoryJobsList/{date},{passenger}")
+    Call<JobRes> GetHistoryJobs(@Path("date") String date, @Path("passenger") String passenger);
+
+    @GET("updateJobStatus/{jobno},{status},{address}")
+    Call<JobRes> UpdateJobStatus(@Path("jobno") String jobno, @Path("status") String status, @Path("address") String address);
+
+    @GET("updateShowConfirmJob/{jobno},{address},{remarks},{status}")
+    Call<JobRes> UpdateShowConfirmJob(@Path("jobno") String jobno,  @Path("address") String address,@Path("remarks") String remarks, @Path("status") String status);
+
+    @GET("updateNoShowJob/{jobno},{address},{remarks},{status}")
+    Call<JobRes> UpdateNoShowConfirmJob(@Path("jobno") String jobno,  @Path("address") String address,@Path("remarks") String remarks, @Path("status") String status);
+
+    @GET("updateCompletedJob/{jobno},{address},{remarks},{status}")
+    Call<JobRes> UpdateCompletedJob(@Path("jobno") String jobno,  @Path("address") String address,@Path("remarks") String remarks, @Path("status") String status);
+
 //    //amad,123,android,241jlksfljsaf
 //    @GET("updatedriverdetail/{user},{deviceId},{deviceType},{fcm_token}")
 //    Call<UpdateDriverDetailRes> updateDriverDetail(@Path("user") String user, @Path("deviceId") String deviceId, @Path("deviceType") String deviceType, @Path("fcm_token") String fcm_token);

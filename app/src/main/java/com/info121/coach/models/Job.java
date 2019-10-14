@@ -4,45 +4,71 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Job {
-	@SerializedName("BookNo")
-	@Expose
-	public String bookNo;
-	@SerializedName("Customer")
-	@Expose
-	public String customer;
 	@SerializedName("Customer_Tel")
-	@Expose
-	public String customerTel;
-	@SerializedName("Destination")
-	@Expose
-	public String destination;
-	@SerializedName("JobCat")
-	@Expose
-	public String jobCat;
-	@SerializedName("JobNo")
-	@Expose
-	public String jobNo;
-	@SerializedName("JobStatus")
-	@Expose
-	public String jobStatus;
-	@SerializedName("JobType")
-	@Expose
-	public String jobType;
-	@SerializedName("PickUp")
-	@Expose
-	public String pickUp;
-	@SerializedName("PickUpTime")
-	@Expose
-	public String pickUpTime;
-	@SerializedName("StatusOrder")
-	@Expose
-	public String statusOrder;
+	private String customerTel;
+
 	@SerializedName("UsageDate")
-	@Expose
-	public String usageDate;
+	private String usageDate;
+
+	@SerializedName("Destination")
+	private String destination;
+
+	@SerializedName("Customer")
+	private String customer;
+
+	@SerializedName("PickUp")
+	private String pickUp;
+
+	@SerializedName("Flight")
+	private String flight;
+
 	@SerializedName("VehicleType")
-	@Expose
-	public String vehicleType;
+	private String vehicleType;
+
+	@SerializedName("JobCat")
+	private String jobCat;
+
+	@SerializedName("ShowRemarks")
+	private String showRemarks;
+
+	@SerializedName("JobStatus")
+	private String jobStatus;
+
+	@SerializedName("ETA")
+	private String eTA;
+
+	@SerializedName("JobType")
+	private String jobType;
+
+	@SerializedName("ShowPhoto")
+	private String showPhoto;
+
+	@SerializedName("StatusOrder")
+	private String statusOrder;
+
+	@SerializedName("Remarks")
+	private String remarks;
+
+	@SerializedName("JobNo")
+	private String jobNo;
+
+	@SerializedName("PickUpTime")
+	private String pickUpTime;
+
+	@SerializedName("NoShowPhoto")
+	private String noShowPhoto;
+
+	@SerializedName("NoShowRemarks")
+	private String noShowRemarks;
+
+	@SerializedName("BookNo")
+	private String bookNo;
+
+	@SerializedName("File1")
+	private String file1;
+
+	@SerializedName("Location")
+	private String location;
 
 	public void setCustomerTel(String customerTel){
 		this.customerTel = customerTel;
@@ -84,6 +110,14 @@ public class Job {
 		return pickUp;
 	}
 
+	public void setFlight(String flight){
+		this.flight = flight;
+	}
+
+	public String getFlight(){
+		return flight;
+	}
+
 	public void setVehicleType(String vehicleType){
 		this.vehicleType = vehicleType;
 	}
@@ -100,12 +134,28 @@ public class Job {
 		return jobCat;
 	}
 
+	public void setShowRemarks(String showRemarks){
+		this.showRemarks = showRemarks;
+	}
+
+	public String getShowRemarks(){
+		return showRemarks;
+	}
+
 	public void setJobStatus(String jobStatus){
 		this.jobStatus = jobStatus;
 	}
 
 	public String getJobStatus(){
 		return jobStatus;
+	}
+
+	public void setETA(String eTA){
+		this.eTA = eTA;
+	}
+
+	public String getETA(){
+		return eTA;
 	}
 
 	public void setJobType(String jobType){
@@ -116,12 +166,28 @@ public class Job {
 		return jobType;
 	}
 
+	public void setShowPhoto(String showPhoto){
+		this.showPhoto = showPhoto;
+	}
+
+	public String getShowPhoto(){
+		return showPhoto;
+	}
+
 	public void setStatusOrder(String statusOrder){
 		this.statusOrder = statusOrder;
 	}
 
 	public String getStatusOrder(){
 		return statusOrder;
+	}
+
+	public void setRemarks(String remarks){
+		this.remarks = remarks;
+	}
+
+	public String getRemarks(){
+		return remarks;
 	}
 
 	public void setJobNo(String jobNo){
@@ -140,6 +206,22 @@ public class Job {
 		return pickUpTime;
 	}
 
+	public void setNoShowPhoto(String noShowPhoto){
+		this.noShowPhoto = noShowPhoto;
+	}
+
+	public String getNoShowPhoto(){
+		return noShowPhoto;
+	}
+
+	public void setNoShowRemarks(String noShowRemarks){
+		this.noShowRemarks = noShowRemarks;
+	}
+
+	public String getNoShowRemarks(){
+		return noShowRemarks;
+	}
+
 	public void setBookNo(String bookNo){
 		this.bookNo = bookNo;
 	}
@@ -148,23 +230,48 @@ public class Job {
 		return bookNo;
 	}
 
+	public void setFile1(String file1){
+		this.file1 = file1;
+	}
+
+	public String getFile1(){
+		return file1;
+	}
+
+	public void setLocation(String location){
+		this.location = location;
+	}
+
+	public String getLocation(){
+		return location;
+	}
+
 	@Override
- 	public String toString(){
-		return 
-			"Job{" +
-			"customer_Tel = '" + customerTel + '\'' + 
-			",usageDate = '" + usageDate + '\'' + 
-			",destination = '" + destination + '\'' + 
-			",customer = '" + customer + '\'' + 
-			",pickUp = '" + pickUp + '\'' + 
-			",vehicleType = '" + vehicleType + '\'' + 
-			",jobCat = '" + jobCat + '\'' + 
-			",jobStatus = '" + jobStatus + '\'' + 
-			",jobType = '" + jobType + '\'' + 
-			",statusOrder = '" + statusOrder + '\'' + 
-			",jobNo = '" + jobNo + '\'' + 
-			",pickUpTime = '" + pickUpTime + '\'' + 
-			",bookNo = '" + bookNo + '\'' + 
-			"}";
-		}
+	public String toString(){
+		return
+				"Response{" +
+						"customer_Tel = '" + customerTel + '\'' +
+						",usageDate = '" + usageDate + '\'' +
+						",destination = '" + destination + '\'' +
+						",customer = '" + customer + '\'' +
+						",pickUp = '" + pickUp + '\'' +
+						",flight = '" + flight + '\'' +
+						",vehicleType = '" + vehicleType + '\'' +
+						",jobCat = '" + jobCat + '\'' +
+						",showRemarks = '" + showRemarks + '\'' +
+						",jobStatus = '" + jobStatus + '\'' +
+						",eTA = '" + eTA + '\'' +
+						",jobType = '" + jobType + '\'' +
+						",showPhoto = '" + showPhoto + '\'' +
+						",statusOrder = '" + statusOrder + '\'' +
+						",remarks = '" + remarks + '\'' +
+						",jobNo = '" + jobNo + '\'' +
+						",pickUpTime = '" + pickUpTime + '\'' +
+						",noShowPhoto = '" + noShowPhoto + '\'' +
+						",noShowRemarks = '" + noShowRemarks + '\'' +
+						",bookNo = '" + bookNo + '\'' +
+						",file1 = '" + file1 + '\'' +
+						",location = '" + location + '\'' +
+						"}";
+	}
 }

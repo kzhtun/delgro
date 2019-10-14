@@ -1,7 +1,11 @@
 package com.info121.coach.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.LocationManager;
+import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -14,6 +18,7 @@ import com.info121.coach.App;
 import com.info121.coach.R;
 import com.info121.coach.api.RestClient;
 import com.info121.coach.models.ObjectRes;
+import com.info121.coach.services.SmartLocationService;
 import com.info121.coach.utils.PrefDB;
 import com.info121.coach.utils.Util;
 
@@ -81,6 +86,9 @@ public class LoginActivity extends AbstractActivity {
                 prefDB.putString(App.CONST_DEVICE_ID, App.deviceID);
                 prefDB.putLong(App.CONST_TIMER_DELAY, App.timerDelay);
 
+                // location
+                startLocationService();
+
                 if (mRemember.isChecked())
                     prefDB.putBoolean(App.CONST_REMEMBER_ME, true);
                 else
@@ -97,5 +105,47 @@ public class LoginActivity extends AbstractActivity {
                 mProgressBar.setVisibility(View.GONE);
             }
         });
+    }
+
+    private void startLocationService() {
+        if (isGPSEnabled()) {
+            Intent serviceIntent = new Intent(LoginActivity.this, SmartLocationService.class);
+            LoginActivity.this.startService(serviceIntent);
+        }
+    }
+
+    private boolean isGPSEnabled() {
+
+        mContext = LoginActivity.this;
+
+        final LocationManager manager = (LocationManager) getSystemService(mContext.LOCATION_SERVICE);
+
+        if (!manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
+
+            alertDialog.setTitle("GPS Settings");
+            alertDialog.setMessage("Your GPS/Location service is off. \n Do you want to turn on location service?");
+
+            // On pressing Settings button
+            alertDialog.setPositiveButton("Settings", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    mContext.startActivity(intent);
+                }
+            });
+
+            // on pressing cancel button
+            alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            // Showing Alert Message
+            alertDialog.show();
+
+            return false;
+        } else
+            return true;
     }
 }

@@ -24,4 +24,8 @@
     <color name="white">#FFFFFF</color>
 
 
+    <color name="accept">#0DAA00</color>
+    <color name="reject">#FF1400</color>
+
+
 </resources>

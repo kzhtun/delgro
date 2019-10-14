@@ -39,8 +39,9 @@ public class App extends Application {
     public static String deviceID = "00000";
     public static String authToken = "00000";
 
-    public static long timerDelay = 0;
+    public static long timerDelay = 60000;
     public static Location location;
+    public static String fullAddress = "";
 
     public static Context targetContent;
 
@@ -62,10 +63,11 @@ public class App extends Application {
     public static List<Job> jobList = new ArrayList<>();
 
     // mcts server "124.6.61.70"
-    public static final String FTP_URL = "icarpark.northvale.mcstservices.com";
-    public static final String FTP_USER = "iCarPark_Demo";
-    public static final String FTP_PASSWORD = "ja8mt988$$";
-    public static String FTP_DIR = "";
+    // NEW SERVER
+    public static final String FTP_URL = "alexisinfo121.noip.me";
+    public static final String FTP_USER = "ipos";
+    public static final String FTP_PASSWORD = "iposftp";
+    public static String FTP_DIR = "mycoachpics";
 
     public static final String[] SONG_PROJECTION = new String[]{
             MediaStore.Audio.Media._ID

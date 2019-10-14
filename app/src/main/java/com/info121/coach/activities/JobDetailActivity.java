@@ -1,5 +1,6 @@
 package com.info121.coach.activities;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -12,9 +13,13 @@ import com.info121.coach.App;
 import com.info121.coach.R;
 import com.info121.coach.adapters.JobDetailPageAdapter;
 import com.info121.coach.adapters.OverviewPageAdapter;
+import com.info121.coach.api.RestClient;
+import com.info121.coach.models.JobRes;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import retrofit2.Call;
 
 public class JobDetailActivity extends AbstractActivity {
     @BindView(R.id.view_pager)
@@ -38,11 +43,20 @@ public class JobDetailActivity extends AbstractActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
+        Intent intent = getIntent();
+
+        String jobNo = intent.getStringExtra("jobNo");
+        int index = intent.getIntExtra("index", 0);
+
         // set view pager
         JobDetailPageAdapter pageAdapter = new JobDetailPageAdapter(getSupportFragmentManager(), App.jobList);
         mViewPager.setAdapter(pageAdapter);
+        mViewPager.setCurrentItem(index);
+
         //mTabLayout.setupWithViewPager(mViewPager);
     }
+
+
 
 
     @Override

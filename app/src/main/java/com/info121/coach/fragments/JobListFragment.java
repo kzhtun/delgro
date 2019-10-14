@@ -88,6 +88,17 @@ public class JobListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        switch (mCurrentTab) {
+            case "TODAY": {
+                getTodayJobs();
+            }
+            break;
+            case "TOMORROW": {
+                getTomorrowJobs();
+            }
+            break;
+        }
+
     }
 
     @Override
@@ -101,28 +112,25 @@ public class JobListFragment extends Fragment {
         mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                getTodayJobs();
-
+                switch (mCurrentTab) {
+                    case "TODAY": {
+                        getTodayJobs();
+                    }
+                    break;
+                    case "TOMORROW": {
+                        getTomorrowJobs();
+                    }
+                    break;
+                }
             }
         });
-
-
-        switch (mCurrentTab) {
-            case "TODAY": {
-                getTodayJobs();
-            }
-            break;
-            case "TOMORROW": {
-                getTomorrowJobs();
-            }
-            break;
-
-        }
-
 
         // Inflate the layout for this fragment
         return view;
     }
+
+
+
 
 
     private void getTodayJobs() {
@@ -134,7 +142,6 @@ public class JobListFragment extends Fragment {
                 mSwipeLayout.setRefreshing(false);
                 mJobList = (List<Job>) response.body().getJobs();
 
-                App.jobList = mJobList;
 
                 if(mJobList.size() > 0)
                     mNoData.setVisibility(View.GONE);
@@ -167,7 +174,6 @@ public class JobListFragment extends Fragment {
                 mSwipeLayout.setRefreshing(false);
                 mJobList = (List<Job>) response.body().getJobs();
 
-                App.jobList = mJobList;
 
                 if(mJobList.size() > 0)
                     mNoData.setVisibility(View.GONE);

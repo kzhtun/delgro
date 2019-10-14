@@ -22,6 +22,7 @@ public class JobDetailPageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int i) {
+
         return JobDetailFragment.newInstance(mJobList.get(i));
     }
 

@@ -25,6 +25,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <service android:name=".services.SmartLocationService" />
+
         <activity android:name=".activities.JobDetailActivity"></activity>
         <activity android:name=".activities.JobOverviewActivity" />
         <activity android:name=".activities.LoginActivity" />

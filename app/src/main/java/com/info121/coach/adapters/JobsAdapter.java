@@ -2,6 +2,7 @@ package com.info121.coach.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.info121.coach.App;
 import com.info121.coach.R;
 import com.info121.coach.activities.JobDetailActivity;
 import com.info121.coach.models.Job;
@@ -62,11 +64,19 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.ViewHolder> {
         viewHolder.passenger.setText(mJobList.get(i).getCustomer());
         viewHolder.mobile.setText(mJobList.get(i).getCustomerTel());
 
+        final  String jobNo =  mJobList.get(i).getJobNo();
+        final int index = i;
 
         viewHolder.parent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mContext.startActivity(new Intent(mContext, JobDetailActivity.class));
+
+                App.jobList = mJobList;
+
+                Intent intent = new Intent(mContext, JobDetailActivity.class);
+                intent.putExtra("jobNo",  jobNo);
+                intent.putExtra("index",  index);
+                mContext.startActivity(intent);
             }
         });
 

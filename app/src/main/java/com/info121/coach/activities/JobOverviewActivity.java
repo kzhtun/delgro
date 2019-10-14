@@ -49,6 +49,7 @@ public class JobOverviewActivity extends AbstractActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
+
 //        TabLayout.Tab tab = mTabLayout.getTabAt(0);
 //        TextView textView = new TextView(mContext);
 //        textView.setText("AAAA");
@@ -61,6 +62,24 @@ public class JobOverviewActivity extends AbstractActivity {
         mTabLayout.setupWithViewPager(mViewPager);
 
 
+//        mTabLayout.getTabAt(0).setCustomView(R.layout.tab_header);
+//        TextView t = mTabLayout.findViewById(R.id.title);
+//        t.setText("TODAY");
+//
+//
+//        mTabLayout.getTabAt(1).setCustomView(R.layout.tab_header);
+//        TextView t1 = mTabLayout.findViewById(R.id.title);
+//        t1.setText("TOMORROW");
+
+//        mTabLayout.getTabAt(2).setCustomView(R.layout.tab_header);
+//         t = mTabLayout.findViewById(R.id.title);
+//        t.setText("FUTURE");
+//
+//        mTabLayout.getTabAt(3).setCustomView(R.layout.tab_header);
+//         t = mTabLayout.findViewById(R.id.title);
+//        t.setText("HISTORY");
+
+
         mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int i, float v, int i1) {
@@ -69,7 +88,7 @@ public class JobOverviewActivity extends AbstractActivity {
 
             @Override
             public void onPageSelected(int i) {
-                App.test = i + "";
+                //App.test = i + "";
 
             }
 

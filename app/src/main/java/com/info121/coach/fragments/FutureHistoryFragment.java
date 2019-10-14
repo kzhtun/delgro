@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.info121.coach.App;
@@ -69,6 +70,8 @@ public class FutureHistoryFragment extends Fragment {
     @BindView(R.id.date)
     EditText mDate;
 
+    @BindView(R.id.sort_layout)
+    LinearLayout mSortLayout;
 
     Context mContext = getActivity();
 
@@ -174,6 +177,13 @@ public class FutureHistoryFragment extends Fragment {
 
         myCalendar = Calendar.getInstance();
 
+
+        if(mCurrentTab.equalsIgnoreCase("HISTORY"))
+            mSortLayout.setVisibility(View.INVISIBLE);
+        else
+            mSortLayout.setVisibility(View.VISIBLE);
+
+
         // Inflate the layout for this fragment
         return view;
     }
@@ -239,9 +249,8 @@ public class FutureHistoryFragment extends Fragment {
         if(mPassenger.getText().length() > 0)
             customer = mPassenger.getText().toString();
 
-        Call<JobRes> call = RestClient.COACH().getApiService().GetFutureJobs(mDate.getText().toString(),
-                customer,
-                sort
+        Call<JobRes> call = RestClient.COACH().getApiService().GetHistoryJobs(mDate.getText().toString(),
+                customer
         );
 
         call.enqueue(new Callback<JobRes>() {
