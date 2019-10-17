@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.info121.coach">
+    package="com.info121.mycoach">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -16,7 +16,7 @@
 
 
     <application
-        android:name=".App"
+        android:name="com.info121.mycoach.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -26,12 +26,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <service android:name=".services.SmartLocationService" />
+        <service android:name="com.info121.mycoach.services.SmartLocationService" />
 
-        <activity android:name=".activities.JobDetailActivity"></activity>
-        <activity android:name=".activities.JobOverviewActivity" />
-        <activity android:name=".activities.LoginActivity" />
-        <activity android:name=".activities.MainActivity">
+        <activity android:name="com.info121.mycoach.activities.JobDetailActivity"></activity>
+        <activity android:name="com.info121.mycoach.activities.JobOverviewActivity" />
+        <activity android:name="com.info121.mycoach.activities.LoginActivity" />
+        <activity android:name="com.info121.mycoach.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

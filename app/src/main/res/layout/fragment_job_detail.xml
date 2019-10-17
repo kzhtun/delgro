@@ -222,13 +222,14 @@
 
             </LinearLayout>
 
-            <ImageView
+            <ImageView android:id="@+id/phone"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginRight="8dp"
                 android:src="@mipmap/ic_phone" />
 
             <ImageView
+                android:id="@+id/sms"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginRight="8dp"
@@ -381,6 +382,22 @@
 
         </LinearLayout>
 
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@color/divider" />
+
+        <Button
+            android:id="@+id/itinerary"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:layout_gravity="center"
+            android:background="@drawable/rounded_button"
+            android:visibility="gone"
+            android:text="ITINERARY"
+            />
 
     </LinearLayout>
 
