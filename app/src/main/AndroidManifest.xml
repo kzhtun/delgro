@@ -26,8 +26,22 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
+        <activity
+            android:name=".activities.DialogActivity"
+            android:excludeFromRecents="true"
+
+            android:theme="@style/Theme.Transparent" />
+
+        <service android:name=".services.ShowDialogService" />
+        <service android:name=".services.FirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
         <service android:name="com.info121.mycoach.services.SmartLocationService" />
 
+
+        <activity android:name=".activities.ToneSelection" />
         <activity android:name="com.info121.mycoach.activities.JobDetailActivity"></activity>
         <activity android:name="com.info121.mycoach.activities.JobOverviewActivity" />
         <activity android:name="com.info121.mycoach.activities.LoginActivity" />

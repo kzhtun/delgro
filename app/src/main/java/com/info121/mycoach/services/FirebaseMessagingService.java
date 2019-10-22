@@ -15,7 +15,11 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.info121.mycoach.App;
 import com.info121.mycoach.R;
 import com.info121.mycoach.activities.DialogActivity;
+import com.info121.mycoach.activities.JobOverviewActivity;
 import com.info121.mycoach.activities.MainActivity;
+import com.info121.mycoach.models.Action;
+
+import org.greenrobot.eventbus.EventBus;
 
 
 public class FirebaseMessagingService extends com.google.firebase.messaging.FirebaseMessagingService {
@@ -31,7 +35,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         OLD_CH  = App.getOldChannelId();
         NEW_CH = App.getNewChannelId();
 
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, JobOverviewActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
 
@@ -80,19 +84,20 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
+
         if (remoteMessage.getData() != null) {
 
-            if (remoteMessage.getData().size() == 2) {
-                showNotification(remoteMessage.getData().get("title"), remoteMessage.getData().get("body"));
-
-            }
-
-            if (remoteMessage.getData().size() == 4) {
+            if(remoteMessage.getData().get("action")==null){
                 showDialog(remoteMessage.getData().get("jobNo"),
                         remoteMessage.getData().get("Name"),
                         remoteMessage.getData().get("phone"),
                         remoteMessage.getData().get("displayMsg")
                 );
+            }else{
+                showNotification(remoteMessage.getData().get("title"), remoteMessage.getData().get("message"));
+                EventBus.getDefault().post(new Action(remoteMessage.getData().get("action"),
+                        remoteMessage.getData().get("jobno")
+                        ));
             }
         }
 

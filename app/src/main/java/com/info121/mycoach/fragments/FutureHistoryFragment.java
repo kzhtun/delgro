@@ -73,6 +73,8 @@ public class FutureHistoryFragment extends Fragment {
 
     Context mContext = getActivity();
 
+    JobsAdapter jobsAdapter;
+
     String mCurrentTab = "";
     Calendar myCalendar;
     String sort = "0";
@@ -182,9 +184,24 @@ public class FutureHistoryFragment extends Fragment {
             mSortLayout.setVisibility(View.VISIBLE);
 
 
+        mRecyclerView.setHasFixedSize(false);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
+        jobsAdapter = new JobsAdapter(mContext, mJobList);
+        mRecyclerView.setAdapter(jobsAdapter);
+
+        mSwipeLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                searchOnClick();
+            }
+        });
+
+
         // Inflate the layout for this fragment
         return view;
     }
+
+
 
     @OnClick(R.id.search)
     public void searchOnClick() {
@@ -217,17 +234,13 @@ public class FutureHistoryFragment extends Fragment {
                 mSwipeLayout.setRefreshing(false);
                 mJobList = (List<Job>) response.body().getJobs();
 
-                App.jobList = mJobList;
-
                 if (mJobList.size() > 0)
                     mNoData.setVisibility(View.GONE);
                 else
                     mNoData.setVisibility(View.VISIBLE);
 
-                // set to recyclerview
-                mRecyclerView.setHasFixedSize(false);
-                mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
-                mRecyclerView.setAdapter(new JobsAdapter(mContext, mJobList));
+                // data refresh
+                jobsAdapter.updateJobList(mJobList);
                 mRecyclerView.getAdapter().notifyDataSetChanged();
 
             }
@@ -257,17 +270,13 @@ public class FutureHistoryFragment extends Fragment {
                 mSwipeLayout.setRefreshing(false);
                 mJobList = (List<Job>) response.body().getJobs();
 
-                App.jobList = mJobList;
-
                 if (mJobList.size() > 0)
                     mNoData.setVisibility(View.GONE);
                 else
                     mNoData.setVisibility(View.VISIBLE);
 
-                // set to recyclerview
-                mRecyclerView.setHasFixedSize(false);
-                mRecyclerView.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
-                mRecyclerView.setAdapter(new JobsAdapter(mContext, mJobList));
+                // data refresh
+                jobsAdapter.updateJobList(mJobList);
                 mRecyclerView.getAdapter().notifyDataSetChanged();
 
             }

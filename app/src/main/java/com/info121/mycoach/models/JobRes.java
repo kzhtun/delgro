@@ -2,62 +2,72 @@ package com.info121.mycoach.models;
 
 import java.util.List;
 
-public class JobRes{
-	private String jobcount;
-	private List<Job> jobs;
-	private String responsemessage;
-	private String status;
-	private String token;
+public class JobRes {
+    private Object jobcount;
+    private List<JobCount> jobcountlist;
+    private List<Job> jobs;
+    private String responsemessage;
+    private String status;
+    private String token;
 
-	public void setJobcount(String jobcount){
-		this.jobcount = jobcount;
-	}
+    public Object getJobcount() {
+        return jobcount;
+    }
 
-	public String getJobcount(){
-		return jobcount;
-	}
+    public void setJobcount(Object jobcount) {
+        this.jobcount = jobcount;
+    }
 
-	public void setJobs(List<Job> jobs){
-		this.jobs = jobs;
-	}
+    public List<JobCount> getJobcountlist() {
+        return jobcountlist;
+    }
 
-	public List<Job> getJobs(){
-		return jobs;
-	}
+    public void setJobcountlist(List<JobCount> jobcountlist) {
+        this.jobcountlist = jobcountlist;
+    }
 
-	public void setResponsemessage(String responsemessage){
-		this.responsemessage = responsemessage;
-	}
+    public List<Job> getJobs() {
+        return jobs;
+    }
 
-	public String getResponsemessage(){
-		return responsemessage;
-	}
+    public void setJobs(List<Job> jobs) {
+        this.jobs = jobs;
+    }
 
-	public void setStatus(String status){
-		this.status = status;
-	}
+    public String getResponsemessage() {
+        return responsemessage;
+    }
 
-	public String getStatus(){
-		return status;
-	}
+    public void setResponsemessage(String responsemessage) {
+        this.responsemessage = responsemessage;
+    }
 
-	public void setToken(String token){
-		this.token = token;
-	}
+    public String getStatus() {
+        return status;
+    }
 
-	public String getToken(){
-		return token;
-	}
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-	@Override
- 	public String toString(){
-		return 
-			"JobRes{" + 
-			"jobcount = '" + jobcount + '\'' + 
-			",jobs = '" + jobs + '\'' + 
-			",responsemessage = '" + responsemessage + '\'' + 
-			",status = '" + status + '\'' + 
-			",token = '" + token + '\'' + 
-			"}";
-		}
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    @Override
+    public String toString() {
+        return
+                "JobRes{" +
+                        "jobcount = '" + jobcount + '\'' +
+                        ",jobcountlist = '" + jobcountlist + '\'' +
+                        ",jobs = '" + jobs + '\'' +
+                        ",responsemessage = '" + responsemessage + '\'' +
+                        ",status = '" + status + '\'' +
+                        ",token = '" + token + '\'' +
+                        "}";
+    }
 }

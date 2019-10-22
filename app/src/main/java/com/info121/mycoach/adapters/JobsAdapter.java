@@ -17,6 +17,7 @@ import com.info121.mycoach.R;
 import com.info121.mycoach.activities.JobDetailActivity;
 import com.info121.mycoach.models.Job;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -26,7 +27,7 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.ViewHolder> {
     private int lastPosition = -1;
 
     private Context mContext;
-    List<Job> mJobList;
+    List<Job> mJobList = new ArrayList<>();
 
 
     public void updateJobList( List<Job> jobList){
@@ -80,6 +81,7 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.ViewHolder> {
                 intent.putExtra("jobNo",  jobNo);
                 intent.putExtra("index",  index);
                 mContext.startActivity(intent);
+
             }
         });
 
@@ -87,7 +89,7 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        return mJobList.size();
+        return  (mJobList==null)? 0 : mJobList.size();
     }
 
 

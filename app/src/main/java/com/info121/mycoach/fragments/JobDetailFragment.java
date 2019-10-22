@@ -3,10 +3,12 @@ package com.info121.mycoach.fragments;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,7 +17,9 @@ import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -27,12 +31,17 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.info121.mycoach.AbstractFragment;
 import com.info121.mycoach.App;
 import com.info121.mycoach.R;
 import com.info121.mycoach.api.RestClient;
+import com.info121.mycoach.models.Action;
 import com.info121.mycoach.models.Job;
 import com.info121.mycoach.models.JobRes;
 import com.info121.mycoach.utils.FtpHelper;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.io.InputStream;
@@ -49,7 +58,7 @@ import static com.info121.mycoach.utils.FtpHelper.getImageUri;
 import static com.info121.mycoach.utils.FtpHelper.getRealPathFromURI;
 
 
-public class JobDetailFragment extends Fragment {
+public class JobDetailFragment extends AbstractFragment {
     Job job;
     private static final int REQUEST_CAMERA_IMAGE = 2001;
 
@@ -145,6 +154,16 @@ public class JobDetailFragment extends Fragment {
         return view;
     }
 
+
+    @OnClick(R.id.layout_pickup)
+    public void pickUpOnClick() {
+        showNavAppSelectionDialog(App.location.getLatitude(), App.location.getLongitude() , job.getPickUp());
+    }
+
+    @OnClick(R.id.layout_dropoff)
+    public void dropOffOnClick() {
+        showNavAppSelectionDialog(App.location.getLatitude(), App.location.getLongitude() , job.getDestination());
+    }
 
     @OnClick(R.id.update_status)
     public void updateStatusOnClick() {
@@ -302,7 +321,10 @@ public class JobDetailFragment extends Fragment {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 callUpdateNoShowPassenger();
+
+
             }
         });
 
@@ -398,7 +420,10 @@ public class JobDetailFragment extends Fragment {
             @Override
             public void onResponse(Call<JobRes> call, Response<JobRes> response) {
                 Toast.makeText(getContext(), "Passenger No Show Successful", Toast.LENGTH_SHORT).show();
+
                 dialog.dismiss();
+                getActivity().finish();
+                EventBus.getDefault().postSticky("UPDATE_JOB_COUNT");
             }
 
             @Override
@@ -421,7 +446,10 @@ public class JobDetailFragment extends Fragment {
             @Override
             public void onResponse(Call<JobRes> call, Response<JobRes> response) {
                 Toast.makeText(getContext(), "Job Complete Successful", Toast.LENGTH_SHORT).show();
+
                 dialog.dismiss();
+                getActivity().finish();
+                EventBus.getDefault().postSticky("UPDATE_JOB_COUNT");
             }
 
             @Override
@@ -499,7 +527,7 @@ public class JobDetailFragment extends Fragment {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                Intent intent = new Intent("android.media.Action.IMAGE_CAPTURE");
                 intent.putExtra("filename", fileName);
                 startActivityForResult(intent, REQUEST_CAMERA_IMAGE);
             }
@@ -538,7 +566,8 @@ public class JobDetailFragment extends Fragment {
 
 
     private void displayUpdateStatus(String status) {
-        mJobStatus.setText(status);
+        job.setJobStatus(status);
+       displayJobDetail();
     }
 
     private void displayJobDetail() {
@@ -561,7 +590,7 @@ public class JobDetailFragment extends Fragment {
     @OnClick(R.id.itinerary)
     public void itineraryOnClick() {
 
-        Uri uri = Uri.parse(App.CONST_PDF_URL +  job.getFile1().toString().trim());
+        Uri uri = Uri.parse(App.CONST_PDF_URL + job.getFile1().toString().trim());
 
         // create an intent builder
         CustomTabsIntent.Builder intentBuilder = new CustomTabsIntent.Builder();
@@ -596,6 +625,8 @@ public class JobDetailFragment extends Fragment {
     }
 
     private void updateJobStatus(final String status) {
+        App.fullAddress = (App.fullAddress.isEmpty()) ? " " : App.fullAddress;
+
         Call<JobRes> call = RestClient.COACH().getApiService().UpdateJobStatus(
                 job.getJobNo(),
                 status,
@@ -635,5 +666,131 @@ public class JobDetailFragment extends Fragment {
         super.onDetach();
     }
 
+
+    public void showNavAppSelectionDialog(final double lat, final double lng, final String address) {
+        Button mGoogleMap, mWaze;
+
+
+
+        final Dialog dialog = new Dialog(getContext() );
+        dialog.setContentView(R.layout.dialog_navigation_app_selection);
+        dialog.setTitle("App Selection");
+
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        Window window = dialog.getWindow();
+        window.setAttributes(lp);
+        window.setGravity(Gravity.CENTER);
+
+        //adding dialog animation sliding up and down
+        //dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setCancelable(true);
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_Fade;
+
+        mGoogleMap = (Button) dialog.findViewById(R.id.btn_google_map);
+        mWaze = (Button) dialog.findViewById(R.id.btn_waze);
+
+
+        if (!hasGoogleMap())
+            mGoogleMap.setVisibility(View.GONE);
+
+        if (!hasWaze())
+            mWaze.setVisibility(View.GONE);
+
+
+        mGoogleMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                if (hasGoogleMap())
+                    showRouteOnGoogleMap(lat, lng);
+                else
+                    gotoPlayStore("com.google.android.apps.maps");
+
+
+            }
+        });
+
+        mWaze.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                if (hasWaze())
+                    showRouteOnWaze(lat, lng, address);
+                else
+                    gotoPlayStore("com.waze");
+            }
+        });
+
+        dialog.show();
+    }
+
+    public boolean hasGoogleMap() {
+        try {
+            String gMap = "com.google.android.apps.maps";
+            Drawable gMapIcon = getContext().getPackageManager().getApplicationIcon(gMap);
+
+            // Assign icon
+            //  mGoogleMap.setBackground(gMapIcon);
+            return true;
+        } catch (PackageManager.NameNotFoundException ne) {
+            return false;
+        }
+    }
+
+    public boolean hasWaze() {
+        try {
+            String waze = "com.waze";
+            Drawable wazeIcon = getContext().getPackageManager().getApplicationIcon(waze);
+
+            // Assign icon
+            // mWaze.setBackground(wazeIcon);
+            return true;
+        } catch (PackageManager.NameNotFoundException ne) {
+            return false;
+        }
+    }
+
+
+    public void showRouteOnGoogleMap(double lat, double lng) {
+        String uri = "http://maps.google.com/maps?saddr=" +
+                App.location.getLatitude() + "," +
+                App.location.getLongitude() + "&daddr=" +
+                lat + "," + lng;
+
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+        intent.setPackage("com.google.android.apps.maps");
+        startActivity(intent);
+    }
+
+    public void showRouteOnWaze(double lat, double lng, String address) {
+//        String uri = "waze://?ll=" + lat + "," + lng +
+//                "&navigate=yes";
+
+        String uri = "https://waze.com/ul?q=" + address +
+                "&navigate=yes";
+
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+        intent.setPackage("com.waze");
+        startActivity(intent);
+    }
+
+    public void gotoPlayStore(String appPackageName) {
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+        }
+    }
+
+
+    @Subscribe(sticky = false)
+    public void onEvent(Action action) {
+        Toast.makeText(getContext(), action.getAction() + " " + action.getJobNo(), Toast.LENGTH_SHORT).show();
+    }
 
 }

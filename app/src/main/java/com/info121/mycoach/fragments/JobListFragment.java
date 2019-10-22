@@ -9,16 +9,22 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.info121.mycoach.AbstractFragment;
 import com.info121.mycoach.R;
 import com.info121.mycoach.adapters.JobsAdapter;
 import com.info121.mycoach.api.RestClient;
+import com.info121.mycoach.models.Action;
 import com.info121.mycoach.models.Job;
 import com.info121.mycoach.models.JobRes;
+
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +43,7 @@ import retrofit2.Response;
  * Use the {@link JobListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class JobListFragment extends Fragment {
+public class JobListFragment extends AbstractFragment {
 
     List<Job> mJobList = new ArrayList<>();
 
@@ -80,7 +86,7 @@ public class JobListFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-
+        getRelatedTabData();
     }
 
     @Override
@@ -90,11 +96,23 @@ public class JobListFragment extends Fragment {
         getRelatedTabData();
     }
 
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        if (isVisibleToUser) {
+
+        }
+    }
+
     @Override
     public void setMenuVisibility(boolean menuVisible) {
         super.setMenuVisibility(menuVisible);
         if (menuVisible) {
             getRelatedTabData();
+
+
         }
     }
 
@@ -154,6 +172,8 @@ public class JobListFragment extends Fragment {
                 jobsAdapter.updateJobList(mJobList);
                 mRecyclerView.getAdapter().notifyDataSetChanged();
 
+                Toast.makeText(getContext(), "Today Jobs Updated", Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
@@ -183,6 +203,7 @@ public class JobListFragment extends Fragment {
                 jobsAdapter.updateJobList(mJobList);
                 mRecyclerView.getAdapter().notifyDataSetChanged();
 
+                Toast.makeText(getContext(), "Tomorrow Jobs Updated", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -203,6 +224,10 @@ public class JobListFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+
+
+
 //        if (context instanceof OnFragmentInteractionListener) {
 //            mListener = (OnFragmentInteractionListener) context;
 //        } else {
@@ -221,6 +246,13 @@ public class JobListFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+
+
+    @Subscribe(sticky = false)
+    public void onEvent(Action action) {
+        Toast.makeText(getContext(), action.getAction() + " " + action.getJobNo(), Toast.LENGTH_SHORT).show();
     }
 
 

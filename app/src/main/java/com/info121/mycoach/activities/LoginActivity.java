@@ -7,10 +7,12 @@ import android.location.LocationManager;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.info121.mycoach.AbstractActivity;
 import com.info121.mycoach.App;
@@ -70,31 +72,12 @@ public class LoginActivity extends AbstractActivity {
         call.enqueue(new Callback<ObjectRes>() {
             @Override
             public void onResponse(Call<ObjectRes> call, Response<ObjectRes> response) {
-                mProgressBar.setVisibility(View.GONE);
-
-                // Add to Appication Varialbles
                 App.userName = mUserName.getText().toString();
                 App.deviceID = Util.getDeviceID(getApplicationContext());
                 App.authToken = response.body().getToken();
                 App.timerDelay = 1000;
 
-                // instantiate wiht new Token
-                //RestClient.Dismiss();
-
-                prefDB.putString(App.CONST_USER_NAME, App.userName);
-                prefDB.putString(App.CONST_DEVICE_ID, App.deviceID);
-                prefDB.putLong(App.CONST_TIMER_DELAY, App.timerDelay);
-
-                // location
-                startLocationService();
-
-                if (mRemember.isChecked())
-                    prefDB.putBoolean(App.CONST_REMEMBER_ME, true);
-                else
-                    prefDB.putBoolean(App.CONST_REMEMBER_ME, false);
-
-                // login successful
-                startActivity(new Intent(LoginActivity.this, JobOverviewActivity.class));
+                callUpdateDevice();
             }
 
             @Override
@@ -104,6 +87,57 @@ public class LoginActivity extends AbstractActivity {
                 mProgressBar.setVisibility(View.GONE);
             }
         });
+    }
+
+    private void callUpdateDevice(){
+        Log.e("====" , "=========================================");
+        Log.e("DEVICE ID: " , Util.getDeviceID(getApplicationContext()));
+        Log.e("DEVICE TYPE " , App.DEVICE_TYPE);
+        Log.e("FCM TOKEN" , App.FCM_TOKEN);
+        Log.e("====" , "=========================================");
+
+
+        Call<ObjectRes> call = RestClient.COACH().getApiService().UpdateDevice(Util.getDeviceID(getApplicationContext()),
+                App.DEVICE_TYPE,
+                App.FCM_TOKEN);
+
+        call.enqueue(new Callback<ObjectRes>() {
+            @Override
+            public void onResponse(Call<ObjectRes> call, Response<ObjectRes> response) {
+                // Add to Appication Varialbles
+
+                loginSuccessful();
+            }
+
+            @Override
+            public void onFailure(Call<ObjectRes> call, Throwable t) {
+                Toast.makeText(mContext, "Getting error in firebase token request.", Toast.LENGTH_SHORT).show();
+                mProgressBar.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void loginSuccessful(){
+        mProgressBar.setVisibility(View.GONE);
+
+
+        // instantiate wiht new Token
+        //RestClient.Dismiss();
+
+        prefDB.putString(App.CONST_USER_NAME, App.userName);
+        prefDB.putString(App.CONST_DEVICE_ID, App.deviceID);
+        prefDB.putLong(App.CONST_TIMER_DELAY, App.timerDelay);
+
+        // location
+        startLocationService();
+
+        if (mRemember.isChecked())
+            prefDB.putBoolean(App.CONST_REMEMBER_ME, true);
+        else
+            prefDB.putBoolean(App.CONST_REMEMBER_ME, false);
+
+        // login successful
+        startActivity(new Intent(LoginActivity.this, JobOverviewActivity.class));
     }
 
     private void startLocationService() {

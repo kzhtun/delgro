@@ -11,6 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="4dp"
+        style="@style/cell_text"
         android:text="Header" />
 
     <TextView
@@ -19,6 +20,7 @@
         android:layout_height="22dp"
         android:gravity="center"
         android:background="@drawable/badge_circle"
+        android:textColor="@color/white"
         android:textSize="10sp"
         android:text="0" />
 

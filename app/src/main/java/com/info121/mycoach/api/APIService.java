@@ -14,6 +14,12 @@ public interface APIService {
     @GET("validatedriver/{user}")
     Call<ObjectRes> ValidateDriver(@Path("user") String user);
 
+    @GET("updatedevice/{deviceId},{platform},{fcm_token}")
+    Call<ObjectRes> UpdateDevice(@Path("deviceId") String deviceId, @Path("platform") String platform, @Path("fcm_token") String fcm_token);
+
+    @GET("getJobsCount")
+    Call<JobRes> GetJobsCount();
+
     @GET("getTodayJobsList")
     Call<JobRes> GetTodayJobs();
 
@@ -26,7 +32,7 @@ public interface APIService {
     @GET("getHistoryJobsList/{date},{passenger}")
     Call<JobRes> GetHistoryJobs(@Path("date") String date, @Path("passenger") String passenger);
 
-    @GET("updateJobStatus/{jobno},{status},{address}")
+    @GET("updateJobStatus/{jobno},{address},{status}")
     Call<JobRes> UpdateJobStatus(@Path("jobno") String jobno, @Path("status") String status, @Path("address") String address);
 
     @GET("updateShowConfirmJob/{jobno},{address},{remarks},{status}")

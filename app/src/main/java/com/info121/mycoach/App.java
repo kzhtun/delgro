@@ -8,8 +8,14 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.info121.mycoach.models.Job;
 import com.info121.mycoach.utils.PrefDB;
 
@@ -20,6 +26,9 @@ import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 
 public class App extends Application {
+    public static String DEVICE_TYPE = "ANDROID";
+    String TAG = "Application";
+
 
     public static String CONST_REST_API_URL = "http://alexisinfo121.noip.me:83/RestAPICoach/MyLimoService.svc/";
     public static String CONST_PDF_URL = "http://alexisinfo121.noip.me:83/iopscoach/uploads/";
@@ -95,6 +104,23 @@ public class App extends Application {
                         .build());
 
 
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.e(TAG, "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        FCM_TOKEN = task.getResult().getToken();
+
+                    }
+                });
+
+        Log.e("TOKEN : " , FCM_TOKEN);
+
 //        File f = new File(Environment.getExternalStorageDirectory(), PHOTO_FOLDER);
 //
 //        if (!f.exists()) {
@@ -103,6 +129,23 @@ public class App extends Application {
 
         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
         StrictMode.setVmPolicy(builder.build());
+
+
+
+        // for notification tone
+        prefDB = new PrefDB(getApplicationContext());
+
+        if (prefDB.getString("OLD_CH_ID").length() == 0)
+            prefDB.putString("OLD_CH_ID", "DEFAULT_OLD");
+
+        if (prefDB.getString("NEW_CH_ID").length() == 0)
+            prefDB.putString("NEW_CH_ID", "DEFAULT_NEW");
+
+        if (prefDB.getString("OLD_CH_ID_P").length() == 0)
+            prefDB.putString("OLD_CH_ID_P", "DEFAULT_OLD_P");
+
+        if (prefDB.getString("NEW_CH_ID_P").length() == 0)
+            prefDB.putString("NEW_CH_ID_P", "DEFAULT_NEW_P");
 
     }
 

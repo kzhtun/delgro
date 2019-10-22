@@ -139,7 +139,7 @@ public class SmartLocationService extends Service implements OnLocationUpdatedLi
 
 
             App.location = mLocation;
-            App.fullAddress = "full address 123 abc YGN."; //getCompleteAddressString(mLocation);
+            App.fullAddress = getCompleteAddressString(mLocation);
 
             Log.e("Address : " , getCompleteAddressString(mLocation));
 
