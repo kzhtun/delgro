@@ -68,6 +68,9 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.ViewHolder> {
         viewHolder.passenger.setText(mJobList.get(i).getCustomer());
         viewHolder.mobile.setText(mJobList.get(i).getCustomerTel());
 
+
+        //viewHolder.passenger.setText(mJobList.get(i).getJobNo());
+
         final  String jobNo =  mJobList.get(i).getJobNo();
         final int index = i;
 

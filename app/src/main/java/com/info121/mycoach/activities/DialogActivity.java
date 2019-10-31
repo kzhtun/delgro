@@ -20,12 +20,17 @@ import android.widget.Toast;
 
 
 import com.info121.mycoach.R;
+import com.info121.mycoach.api.RestClient;
+import com.info121.mycoach.models.JobRes;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DialogActivity extends AppCompatActivity {
     public static final String JOB_NO = "JOB_NO";
@@ -58,6 +63,8 @@ public class DialogActivity extends AppCompatActivity {
     @BindView(R.id.call2)
     ImageView mCall2;
 
+    private String mJobNo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +94,8 @@ public class DialogActivity extends AppCompatActivity {
         final String phones = intent.getExtras().getString(PHONE);
         final String message = intent.getExtras().getString(MESSAGE);
         final String jobNo = intent.getExtras().getString(JOB_NO);
+
+        mJobNo = jobNo;
 
 
 //        // for testing purpose only
@@ -169,6 +178,7 @@ public class DialogActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
+                callConfirmJobReminder();
              //   APIClient.ConfirmJob(jobNo);
             }
         });
@@ -221,5 +231,29 @@ public class DialogActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         return adapter;
+    }
+
+
+    private void callConfirmJobReminder(){
+
+            Call<JobRes> call = RestClient.COACH().getApiService().ConfirmJobReminder(
+                    mJobNo
+            );
+
+            call.enqueue(new Callback<JobRes>() {
+                @Override
+                public void onResponse(Call<JobRes> call, Response<JobRes> response) {
+                    Toast.makeText(DialogActivity.this, "Job confirmed", Toast.LENGTH_SHORT).show();
+                    finish();
+
+                }
+
+                @Override
+                public void onFailure(Call<JobRes> call, Throwable t) {
+                    Toast.makeText(DialogActivity.this, "Job confirm failed", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            });
+
     }
 }

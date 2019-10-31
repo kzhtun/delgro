@@ -3,7 +3,12 @@ package com.info121.mycoach.activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.location.LocationManager;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
@@ -20,8 +25,12 @@ import com.info121.mycoach.R;
 import com.info121.mycoach.api.RestClient;
 import com.info121.mycoach.models.ObjectRes;
 import com.info121.mycoach.services.SmartLocationService;
+import com.info121.mycoach.utils.GeocodingLocation;
 import com.info121.mycoach.utils.PrefDB;
 import com.info121.mycoach.utils.Util;
+
+import java.io.IOException;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -60,6 +69,7 @@ public class LoginActivity extends AbstractActivity {
 
     }
 
+
     @OnClick(R.id.login)
     public void loginOnClick(){
         mProgressBar.setVisibility(View.VISIBLE);
@@ -72,17 +82,25 @@ public class LoginActivity extends AbstractActivity {
         call.enqueue(new Callback<ObjectRes>() {
             @Override
             public void onResponse(Call<ObjectRes> call, Response<ObjectRes> response) {
-                App.userName = mUserName.getText().toString();
-                App.deviceID = Util.getDeviceID(getApplicationContext());
-                App.authToken = response.body().getToken();
-                App.timerDelay = 1000;
 
-                callUpdateDevice();
+                if(response.body().getResponsemessage().equalsIgnoreCase("VALID")){
+                    App.userName = mUserName.getText().toString();
+                    App.deviceID = Util.getDeviceID(getApplicationContext());
+                    App.authToken = response.body().getToken();
+                    App.timerDelay = 1000;
+
+                    callUpdateDevice();
+                }else{
+                    mUserName.setError("Wrong user name");
+                    mUserName.requestFocus();
+                    mProgressBar.setVisibility(View.GONE);
+                }
+
             }
 
             @Override
             public void onFailure(Call<ObjectRes> call, Throwable t) {
-                mUserName.setError("Wrong user name");
+                mUserName.setError("Error in connection.");
                 mUserName.requestFocus();
                 mProgressBar.setVisibility(View.GONE);
             }

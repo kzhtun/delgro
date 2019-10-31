@@ -84,9 +84,7 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
 
-
         if (remoteMessage.getData() != null) {
-
             if(remoteMessage.getData().get("action")==null){
                 showDialog(remoteMessage.getData().get("jobNo"),
                         remoteMessage.getData().get("Name"),
@@ -98,6 +96,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
                 EventBus.getDefault().post(new Action(remoteMessage.getData().get("action"),
                         remoteMessage.getData().get("jobno")
                         ));
+
+                EventBus.getDefault().postSticky("UPDATE_JOB_COUNT");
             }
         }
 
@@ -120,8 +120,8 @@ public class FirebaseMessagingService extends com.google.firebase.messaging.Fire
         Uri soundUri = App.getProminentSoundUri();
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NEW_CH)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Tita Limo")
-                .setContentText("New job received")
+                .setContentTitle("My Coach")
+                .setContentText("A job has been alerted for your confirmation.")
                 .setAutoCancel(true)
                 .setSound(soundUri)
                 .setContentIntent(pendingIntent);

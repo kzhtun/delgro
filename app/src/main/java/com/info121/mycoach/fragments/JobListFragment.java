@@ -24,6 +24,7 @@ import com.info121.mycoach.models.Action;
 import com.info121.mycoach.models.Job;
 import com.info121.mycoach.models.JobRes;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
@@ -163,10 +164,11 @@ public class JobListFragment extends AbstractFragment {
                 mSwipeLayout.setRefreshing(false);
                 mJobList = (List<Job>) response.body().getJobs();
 
-                if (mJobList.size() > 0)
-                    mNoData.setVisibility(View.GONE);
-                else
-                    mNoData.setVisibility(View.VISIBLE);
+                if (mJobList != null)
+                    if (mJobList.size() > 0)
+                        mNoData.setVisibility(View.GONE);
+                    else
+                        mNoData.setVisibility(View.VISIBLE);
 
                 // data refresh
                 jobsAdapter.updateJobList(mJobList);
@@ -194,10 +196,11 @@ public class JobListFragment extends AbstractFragment {
                 mSwipeLayout.setRefreshing(false);
                 mJobList = (List<Job>) response.body().getJobs();
 
-                if (mJobList.size() > 0)
-                    mNoData.setVisibility(View.GONE);
-                else
-                    mNoData.setVisibility(View.VISIBLE);
+                if (mJobList != null)
+                    if (mJobList.size() > 0)
+                        mNoData.setVisibility(View.GONE);
+                    else
+                        mNoData.setVisibility(View.VISIBLE);
 
                 // data refresh
                 jobsAdapter.updateJobList(mJobList);
@@ -226,8 +229,6 @@ public class JobListFragment extends AbstractFragment {
         super.onAttach(context);
 
 
-
-
 //        if (context instanceof OnFragmentInteractionListener) {
 //            mListener = (OnFragmentInteractionListener) context;
 //        } else {
@@ -249,10 +250,11 @@ public class JobListFragment extends AbstractFragment {
     }
 
 
-
     @Subscribe(sticky = false)
     public void onEvent(Action action) {
-        Toast.makeText(getContext(), action.getAction() + " " + action.getJobNo(), Toast.LENGTH_SHORT).show();
+        //  Toast.makeText(getContext(), "Action Done", Toast.LENGTH_SHORT).show();
+        getRelatedTabData();
+
     }
 
 

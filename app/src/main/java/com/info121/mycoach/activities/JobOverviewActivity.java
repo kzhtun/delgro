@@ -1,13 +1,23 @@
 package com.info121.mycoach.activities;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +28,7 @@ import com.info121.mycoach.adapters.OverviewPageAdapter;
 import com.info121.mycoach.api.RestClient;
 import com.info121.mycoach.models.JobCount;
 import com.info121.mycoach.models.JobRes;
+import com.info121.mycoach.services.SmartLocationService;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -104,6 +115,8 @@ public class JobOverviewActivity extends AbstractActivity {
                     updateTabs(response.body().getJobcountlist());
                 else
                     initializeTabs(response.body().getJobcountlist());
+
+                Toast.makeText(mContext, "Update Job List", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -118,43 +131,50 @@ public class JobOverviewActivity extends AbstractActivity {
         View v;
         TextView header, badge;
 
-        JobCount jobCount = jobCountList.get(0);
+        try {
 
-        //  TabLayout.Tab tabitem = mTabLayout.newTab();
+            JobCount jobCount = jobCountList.get(0);
 
-        tabitem = mTabLayout.getTabAt(0);
-        v = View.inflate(mContext, R.layout.tab_header, null);
-        header = v.findViewById(R.id.title);
-        badge = v.findViewById(R.id.job_count);
-        header.setText("TODAY");
-        badge.setText(jobCount.getTodayjobcount());
-        tabitem.setCustomView(v);
+            //  TabLayout.Tab tabitem = mTabLayout.newTab();
 
-        tabitem = mTabLayout.getTabAt(1);
-        v = View.inflate(mContext, R.layout.tab_header, null);
-        header = v.findViewById(R.id.title);
-        badge = v.findViewById(R.id.job_count);
-        header.setText("TMR");
-        badge.setText(jobCount.getTomorrowjobcount());
-        tabitem.setCustomView(v);
+            tabitem = mTabLayout.getTabAt(0);
+            v = View.inflate(mContext, R.layout.tab_header, null);
+            header = v.findViewById(R.id.title);
+            badge = v.findViewById(R.id.job_count);
+            header.setText("TODAY");
+            badge.setText(jobCount.getTodayjobcount());
+            tabitem.setCustomView(v);
 
-
-        tabitem = mTabLayout.getTabAt(2);
-        v = View.inflate(mContext, R.layout.tab_header, null);
-        header = v.findViewById(R.id.title);
-        badge = v.findViewById(R.id.job_count);
-        header.setText("FUTURE");
-        badge.setText(jobCount.getFuturejobcount());
-        tabitem.setCustomView(v);
+            tabitem = mTabLayout.getTabAt(1);
+            v = View.inflate(mContext, R.layout.tab_header, null);
+            header = v.findViewById(R.id.title);
+            badge = v.findViewById(R.id.job_count);
+            header.setText("TMR");
+            badge.setText(jobCount.getTomorrowjobcount());
+            tabitem.setCustomView(v);
 
 
-        tabitem = mTabLayout.getTabAt(3);
-        v = View.inflate(mContext, R.layout.tab_header, null);
-        header = v.findViewById(R.id.title);
-        badge = v.findViewById(R.id.job_count);
-        header.setText("HISTORY");
-        badge.setText("0");
-        tabitem.setCustomView(v);
+            tabitem = mTabLayout.getTabAt(2);
+            v = View.inflate(mContext, R.layout.tab_header, null);
+            header = v.findViewById(R.id.title);
+            badge = v.findViewById(R.id.job_count);
+            header.setText("FUTURE");
+            badge.setText(jobCount.getFuturejobcount());
+            tabitem.setCustomView(v);
+
+
+            tabitem = mTabLayout.getTabAt(3);
+            v = View.inflate(mContext, R.layout.tab_header, null);
+            header = v.findViewById(R.id.title);
+            badge = v.findViewById(R.id.job_count);
+            header.setText("HISTORY");
+            badge.setVisibility(View.INVISIBLE);
+            badge.setText("0");
+            tabitem.setCustomView(v);
+
+        }catch(Exception e){
+            return;
+        }
     }
 
     private void updateTabs(List<JobCount> jobCountList) {
@@ -181,6 +201,93 @@ public class JobOverviewActivity extends AbstractActivity {
         badge.setText("0");
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(Menu.NONE, 0, Menu.NONE, "Option")
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        showSettingSelectDialog();
+                        return true;
+                    }
+                })
+                .setIcon(ContextCompat.getDrawable(mContext, R.mipmap.ic_settings_white_24dp))
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+
+        menu.add(Menu.NONE, 1, Menu.NONE, "Logout")
+                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        finish();
+                        //prefDB.remove(App.CONST_ALREADY_LOGIN);
+                        stopLocationService();
+                        return true;
+                    }
+                })
+                .setIcon(ContextCompat.getDrawable(mContext, R.mipmap.ic_exit_to_app_white_24dp))
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    private void showSettingSelectDialog() {
+        Button mNoti, mProminent;
+
+        final Dialog dialog = new Dialog(this, R.style.Theme_AppCompat);
+        dialog.setContentView(R.layout.dialog_setting_selection);
+        dialog.setTitle("App Selection");
+
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        Window window = dialog.getWindow();
+        window.setAttributes(lp);
+        window.setGravity(Gravity.CENTER);
+
+
+        //adding dialog animation sliding up and down
+        // dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+
+        // to cancel when outside touch
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setCancelable(true);
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_Fade;
+
+        // window.setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
+
+        mNoti = (Button) dialog.findViewById(R.id.btn_notification);
+        mProminent = (Button) dialog.findViewById(R.id.btn_prominent);
+
+        mProminent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+
+                Intent intent = new Intent(mContext, ToneSelection.class);
+                intent.putExtra(ToneSelection.TONE_TYPE, "PROMINENT");
+                startActivity(intent);
+            }
+        });
+
+        mNoti.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+
+                Intent intent = new Intent(mContext, ToneSelection.class);
+                intent.putExtra(ToneSelection.TONE_TYPE, "NOTIFICATION");
+                startActivity(intent);
+            }
+        });
+
+
+        dialog.show();
+
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -201,7 +308,13 @@ public class JobOverviewActivity extends AbstractActivity {
     @Subscribe(sticky = true)
     public void onEvent(String event) {
         EventBus.getDefault().removeStickyEvent("UPDATE_JOB_COUNT");
-        Toast.makeText(mContext, "Update Job List", Toast.LENGTH_SHORT).show();
+
         callJobsCount(true);
+    }
+
+
+    private void stopLocationService(){
+        Intent intent = new Intent(mContext, SmartLocationService.class);
+        mContext.stopService(intent);
     }
 }

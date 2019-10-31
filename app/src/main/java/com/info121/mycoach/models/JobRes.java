@@ -6,6 +6,7 @@ public class JobRes {
     private Object jobcount;
     private List<JobCount> jobcountlist;
     private List<Job> jobs;
+    private Job jobdetails;
     private String responsemessage;
     private String status;
     private String token;
@@ -56,6 +57,14 @@ public class JobRes {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Job getJobdetails() {
+        return jobdetails;
+    }
+
+    public void setJobdetails(Job jobdetails) {
+        jobdetails = jobdetails;
     }
 
     @Override

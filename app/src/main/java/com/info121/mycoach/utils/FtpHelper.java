@@ -9,8 +9,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.widget.Toast;
 
 import com.adeel.library.easyFTP;
+import com.info121.mycoach.App;
+import com.info121.mycoach.api.RestClient;
+import com.info121.mycoach.models.JobRes;
 
 
 import org.apache.commons.net.ftp.FTP;
@@ -20,6 +24,10 @@ import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.InetAddress;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Created by KZHTUN on 8/3/2017.
@@ -108,7 +116,7 @@ public class FtpHelper {
                 ftpClient.login(params[1], params[2]);
 
                 if (!params[3].isEmpty()) {
-                   status = ftpClient.changeWorkingDirectory(params[3]); // if User say provided any Destination then Set it , otherwise
+                    status = ftpClient.changeWorkingDirectory(params[3]); // if User say provided any Destination then Set it , otherwise
                 }
 
 
@@ -125,6 +133,7 @@ public class FtpHelper {
 
 
                 publishProgress("Upload Successful ...");
+
 
                 return new String("Upload Successful");
 
@@ -148,76 +157,114 @@ public class FtpHelper {
                 public void run() {
                     prg.dismiss();
 
-                    if (mType == "PHOTO")
-                      //  APIClient.SaveShowPicture(App.userName, mJobNo, mFileName);
+                    if (mType.equalsIgnoreCase("SHOW"))
+                        callSaveShowPhoto(context, mJobNo, mFileName);
 
-                    if (mType == "SIGNATURE") {
-                      //  APIClient.SaveSignature( mJobNo, mFileName);
+                    if (mType.equalsIgnoreCase("NOSHOW"))
+                        callSaveNoShowPhoto(context, mJobNo, mFileName);
 
-                        ((Activity) context).finish();
-                    }
 
                 }
             }, 2000);
 
 
-
-
-                // Toast.makeText(demo.this,str,Toast.LENGTH_LONG).show();
-            }
+            // Toast.makeText(demo.this,str,Toast.LENGTH_LONG).show();
         }
-
-        public class downloadTask extends AsyncTask<String, Void, String> {
-            ProgressDialog prg;
-            Context context;
-            InputStream inputStream;
-
-            public downloadTask(Context context) {
-                this.context = context;
-                this.inputStream = inputStream;
-            }
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                prg = new ProgressDialog(context);
-                prg.setMessage("Downloading...");
-                prg.show();
-            }
-
-            @Override
-            protected String doInBackground(String... params) {
-                try {
-                    easyFTP ftp = new easyFTP();
-//
-                    ftp.connect(params[0], params[1], params[2]);
-                    ftp.downloadFile(params[3], params[4]);
-                    return new String("Download Successful");
-                } catch (Exception e) {
-                    String t = "Failure : " + e.getLocalizedMessage();
-                    return t;
-                }
-            }
-
-            @Override
-            protected void onPostExecute(String str) {
-                prg.dismiss();
-                // Toast.makeText(demo.this,str,Toast.LENGTH_LONG).show();
-            }
-        }
-
-        public static Uri getImageUri(Context inContext, Bitmap inImage) {
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-            String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-            return Uri.parse(path);
-        }
-
-        public static String getRealPathFromURI(Context context, Uri uri) {
-            Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            return cursor.getString(idx);
-        }
-
     }
+
+    public class downloadTask extends AsyncTask<String, Void, String> {
+        ProgressDialog prg;
+        Context context;
+        InputStream inputStream;
+
+        public downloadTask(Context context) {
+            this.context = context;
+            this.inputStream = inputStream;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            prg = new ProgressDialog(context);
+            prg.setMessage("Downloading...");
+            prg.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            try {
+                easyFTP ftp = new easyFTP();
+//
+                ftp.connect(params[0], params[1], params[2]);
+                ftp.downloadFile(params[3], params[4]);
+                return new String("Download Successful");
+            } catch (Exception e) {
+                String t = "Failure : " + e.getLocalizedMessage();
+                return t;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String str) {
+            prg.dismiss();
+            // Toast.makeText(demo.this,str,Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public static Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+    public static String getRealPathFromURI(Context context, Uri uri) {
+        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
+        cursor.moveToFirst();
+        int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+        return cursor.getString(idx);
+    }
+
+
+    private static void callSaveShowPhoto(final Context context, String jobNo, String fileName) {
+        Call<JobRes> call = RestClient.COACH().getApiService().SaveShowPic(
+                jobNo,
+                fileName
+        );
+
+
+        call.enqueue(new Callback<JobRes>() {
+            @Override
+            public void onResponse(Call<JobRes> call, Response<JobRes> response) {
+                Toast.makeText(context, "Show save successful", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<JobRes> call, Throwable t) {
+                Toast.makeText(context, "Show save failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    private static void callSaveNoShowPhoto(final Context context, String jobNo, String fileName) {
+        Call<JobRes> call = RestClient.COACH().getApiService().SaveNoShowPic(
+                jobNo,
+                fileName
+        );
+
+
+        call.enqueue(new Callback<JobRes>() {
+            @Override
+            public void onResponse(Call<JobRes> call, Response<JobRes> response) {
+                Toast.makeText(context, "No show save successful", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<JobRes> call, Throwable t) {
+                Toast.makeText(context, "No show save failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+}

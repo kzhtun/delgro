@@ -11,7 +11,6 @@
         android:layout_margin="32dp"
         android:orientation="vertical">
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,7 +34,7 @@
                     android:text="CONFIRM" />
 
                 <TextView
-                    style="@style/cell_label"
+                    style="@style/cell_label_dark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="CONFIRM" />
@@ -73,7 +72,7 @@
                     android:text="OTW" />
 
                 <TextView
-                    style="@style/cell_label"
+                    style="@style/cell_label_dark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="ON THE WAY" />
@@ -148,7 +147,7 @@
                     android:text="ON SITE" />
 
                 <TextView
-                    style="@style/cell_label"
+                    style="@style/cell_label_dark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="ON SITE" />
@@ -185,7 +184,7 @@
                     android:text="POB" />
 
                 <TextView
-                    style="@style/cell_label"
+                    style="@style/cell_label_dark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="PASSENGER ON BOARD" />
@@ -255,7 +254,7 @@
                     android:text="PNS" />
 
                 <TextView
-                    style="@style/cell_label"
+                    style="@style/cell_label_dark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="PASSENGER NO SHOW" />
@@ -269,7 +268,7 @@
 
 
             <LinearLayout
-                android:id="@+id/cnpl"
+                android:id="@+id/cmpl"
                 android:layout_width="120dp"
                 android:layout_height="50dp"
                 android:background="@drawable/rounded_button"
@@ -283,10 +282,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="4dp"
-                    android:text="CNPL" />
+                    android:text="CMPL" />
 
                 <TextView
-                    style="@style/cell_label"
+                    style="@style/cell_label_dark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="COMPLETE" />

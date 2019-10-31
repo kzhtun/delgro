@@ -17,6 +17,7 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.info121.mycoach.App;
@@ -25,6 +26,7 @@ import com.info121.mycoach.adapters.JobsAdapter;
 import com.info121.mycoach.api.RestClient;
 import com.info121.mycoach.models.Job;
 import com.info121.mycoach.models.JobRes;
+import com.info121.mycoach.utils.Util;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -70,6 +72,10 @@ public class FutureHistoryFragment extends Fragment {
 
     @BindView(R.id.sort_layout)
     LinearLayout mSortLayout;
+
+
+    @BindView(R.id.sort_asc)
+    RadioButton sortAsc;
 
     Context mContext = getActivity();
 
@@ -123,6 +129,9 @@ public class FutureHistoryFragment extends Fragment {
     }
 
     private void showDateDialog() {
+
+
+
         DatePickerDialog.OnDateSetListener dateListener = new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear,
@@ -139,24 +148,33 @@ public class FutureHistoryFragment extends Fragment {
             }
         };
 
-        new DatePickerDialog(getContext(), dateListener,
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), dateListener,
                 myCalendar.get(Calendar.YEAR),
                 myCalendar.get(Calendar.MONTH),
-                myCalendar.get(Calendar.DAY_OF_MONTH)
-        ).show();
-    }
+                myCalendar.get(Calendar.DAY_OF_MONTH));
 
+       if(mCurrentTab.equalsIgnoreCase("FUTURE"))
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() + 172800000);
+
+        if(mCurrentTab.equalsIgnoreCase("HISTORY"))
+            datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+
+        datePickerDialog.show();
+
+    }
 
     @Override
     public void onResume() {
         super.onResume();
-
 
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        searchOnClick();
 
     }
 
@@ -177,7 +195,6 @@ public class FutureHistoryFragment extends Fragment {
 
         myCalendar = Calendar.getInstance();
 
-
         if(mCurrentTab.equalsIgnoreCase("HISTORY"))
             mSortLayout.setVisibility(View.INVISIBLE);
         else
@@ -196,6 +213,7 @@ public class FutureHistoryFragment extends Fragment {
             }
         });
 
+        sortAsc.setChecked(true);
 
         // Inflate the layout for this fragment
         return view;
@@ -220,11 +238,16 @@ public class FutureHistoryFragment extends Fragment {
     private void getFutureJobs() {
         String customer = " ";
 
-        if(mPassenger.getText().length() > 0)
+        if(mPassenger.getText().length() == 0)
+            customer = " ";
+        else
             customer = mPassenger.getText().toString();
 
+        if(mDate.getText().length() == 0)
+            mDate.setText(" ");
+
         Call<JobRes> call = RestClient.COACH().getApiService().GetFutureJobs(mDate.getText().toString(),
-                customer,
+                Util.replaceEscapeChr(customer),
                 sort
         );
 
@@ -257,11 +280,18 @@ public class FutureHistoryFragment extends Fragment {
     private void getHistoryJobs() {
         String customer = " ";
 
-        if(mPassenger.getText().length() > 0)
+        if(mPassenger.getText().length() == 0)
+            customer = " ";
+        else
             customer = mPassenger.getText().toString();
 
-        Call<JobRes> call = RestClient.COACH().getApiService().GetHistoryJobs(mDate.getText().toString(),
-                customer
+        if(mDate.getText().length() == 0)
+            mDate.setText(" ");
+
+        Call<JobRes> call = RestClient.COACH().getApiService().GetHistoryJobs(
+                mDate.getText().toString(),
+                Util.replaceEscapeChr(customer),
+                sort
         );
 
         call.enqueue(new Callback<JobRes>() {

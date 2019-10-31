@@ -1,5 +1,6 @@
 package com.info121.mycoach.fragments;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -9,13 +10,18 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -39,12 +45,19 @@ import com.info121.mycoach.models.Action;
 import com.info121.mycoach.models.Job;
 import com.info121.mycoach.models.JobRes;
 import com.info121.mycoach.utils.FtpHelper;
+import com.info121.mycoach.utils.GeocodingLocation;
+import com.info121.mycoach.utils.Util;
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
+import com.squareup.picasso.Picasso;
+
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.io.InputStream;
+import java.time.LocalTime;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -60,7 +73,8 @@ import static com.info121.mycoach.utils.FtpHelper.getRealPathFromURI;
 
 public class JobDetailFragment extends AbstractFragment {
     Job job;
-    private static final int REQUEST_CAMERA_IMAGE = 2001;
+    private static final int REQUEST_SHOW_CAMERA = 2001;
+    private static final int REQUEST_NO_SHOW_CAMERA = 2002;
 
     Dialog dialog;
 
@@ -157,12 +171,12 @@ public class JobDetailFragment extends AbstractFragment {
 
     @OnClick(R.id.layout_pickup)
     public void pickUpOnClick() {
-        showNavAppSelectionDialog(App.location.getLatitude(), App.location.getLongitude() , job.getPickUp());
+        showNavAppSelectionDialog(App.location.getLatitude(), App.location.getLongitude(), job.getPickUp());
     }
 
     @OnClick(R.id.layout_dropoff)
     public void dropOffOnClick() {
-        showNavAppSelectionDialog(App.location.getLatitude(), App.location.getLongitude() , job.getDestination());
+        showNavAppSelectionDialog(App.location.getLatitude(), App.location.getLongitude(), job.getDestination());
     }
 
     @OnClick(R.id.update_status)
@@ -175,14 +189,14 @@ public class JobDetailFragment extends AbstractFragment {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         dialog.setContentView(R.layout.dialog_update_job);
-        dialog.setTitle("Update Job");
+        dialog.setTitle("");
 
         LinearLayout confirm = dialog.findViewById(R.id.confirm);
         LinearLayout otw = dialog.findViewById(R.id.otw);
         LinearLayout onSite = dialog.findViewById(R.id.on_site);
         LinearLayout pob = dialog.findViewById(R.id.pob);
         LinearLayout pns = dialog.findViewById(R.id.pns);
-        LinearLayout cnpl = dialog.findViewById(R.id.cnpl);
+        LinearLayout cmpl = dialog.findViewById(R.id.cmpl);
 
 
         switch (job.getJobStatus().toUpperCase()) {
@@ -199,7 +213,7 @@ public class JobDetailFragment extends AbstractFragment {
                 break;
 
             case "PASSENGER ON BOARD":
-                changeUpdateButtonBackground(cnpl, true);
+                changeUpdateButtonBackground(cmpl, true);
                 break;
 
 //            case "PASSENGER NO SHOW":
@@ -211,6 +225,13 @@ public class JobDetailFragment extends AbstractFragment {
 //                break;
         }
 
+        confirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                updateJobStatus("Confirm");
+                dialog.dismiss();
+            }
+        });
 
         otw.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -241,11 +262,11 @@ public class JobDetailFragment extends AbstractFragment {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
-                NoshowPassengerOnBoardDialog();
+                showPassengerNoShowDialog();
             }
         });
 
-        cnpl.setOnClickListener(new View.OnClickListener() {
+        cmpl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
@@ -263,7 +284,7 @@ public class JobDetailFragment extends AbstractFragment {
         dialog = new Dialog(getActivity());
 
         dialog.setContentView(R.layout.dialog_complete);
-        dialog.setTitle("POB ");
+        dialog.setTitle("");
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
 
@@ -297,34 +318,42 @@ public class JobDetailFragment extends AbstractFragment {
         dialog.getWindow().setAttributes(lp);
     }
 
-    private void NoshowPassengerOnBoardDialog() {
+    private void showPassengerNoShowDialog() {
         dialog = new Dialog(getActivity());
 
         dialog.setContentView(R.layout.dialog_pob);
-        dialog.setTitle("POB ");
+        dialog.setTitle("");
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         TextView title = dialog.findViewById(R.id.title);
+        TextView label = dialog.findViewById(R.id.photo_label);
+        TextView remarks = dialog.findViewById(R.id.remarks);
         ImageView addPhoto = dialog.findViewById(R.id.add_photo);
+        ImageView passengerPhoto = dialog.findViewById(R.id.passenger_photo);
         Button save = dialog.findViewById(R.id.save);
 
         title.setText("PASSENGER NO SHOW");
+        label.setText("PHOTO");
+        remarks.setText(job.getNoShowRemarks());
+
+        passengerPhoto.setImageResource(0);
+        Picasso.get().load(App.CONST_PHOTO_URL + job.getNoShowPhoto())
+                .networkPolicy(NetworkPolicy.NO_CACHE)
+                .memoryPolicy(MemoryPolicy.NO_CACHE)
+                //    .placeholder(R.drawable.bv_logo_default).stableKey(id)
+                .into(passengerPhoto);
 
         addPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openCamera(job.getBookNo() + ".jpg", job.getJobNo());
+                openCamera(REQUEST_NO_SHOW_CAMERA, job.getJobNo());
             }
         });
-
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 callUpdateNoShowPassenger();
-
-
             }
         });
 
@@ -345,22 +374,35 @@ public class JobDetailFragment extends AbstractFragment {
         dialog = new Dialog(getActivity());
 
         dialog.setContentView(R.layout.dialog_pob);
-        dialog.setTitle("POB ");
+        dialog.setTitle("");
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
         TextView title = dialog.findViewById(R.id.title);
+        TextView label = dialog.findViewById(R.id.photo_label);
+        TextView remarks = dialog.findViewById(R.id.remarks);
         ImageView addPhoto = dialog.findViewById(R.id.add_photo);
+        ImageView passengerPhoto = dialog.findViewById(R.id.passenger_photo);
         Button save = dialog.findViewById(R.id.save);
 
         title.setText("PASSENGER ON BOARD");
+        label.setText("PASSENGER PHOTO");
+        remarks.setText(job.getShowRemarks());
+
+        passengerPhoto.setImageResource(0);
+
+        Picasso.get().load(App.CONST_PHOTO_URL + job.getShowPhoto())
+                .networkPolicy(NetworkPolicy.NO_CACHE)
+                .memoryPolicy(MemoryPolicy.NO_CACHE)
+                //    .placeholder(R.drawable.bv_logo_default).stableKey(id)
+                .into(passengerPhoto);
+
 
         addPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openCamera(job.getBookNo() + ".jpg", job.getJobNo());
+                openCamera(REQUEST_SHOW_CAMERA, job.getJobNo());
             }
         });
-
 
         save.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -368,7 +410,6 @@ public class JobDetailFragment extends AbstractFragment {
                 callUpdateShowPassenger();
             }
         });
-
 
         // resize dialog
         Rect displayRectangle = new Rect();
@@ -388,7 +429,7 @@ public class JobDetailFragment extends AbstractFragment {
         Call<JobRes> call = RestClient.COACH().getApiService().UpdateShowConfirmJob(
                 job.getJobNo(),
                 App.fullAddress,
-                remark.getText().toString(),
+                Util.replaceEscapeChr(remark.getText().toString()),
                 "Passenger On Board"
         );
 
@@ -398,6 +439,8 @@ public class JobDetailFragment extends AbstractFragment {
                 Toast.makeText(getContext(), "Passenger On Board Successful", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
                 displayUpdateStatus("Passenger On Board");
+
+                callJobDetail();
             }
 
             @Override
@@ -412,7 +455,7 @@ public class JobDetailFragment extends AbstractFragment {
         Call<JobRes> call = RestClient.COACH().getApiService().UpdateNoShowConfirmJob(
                 job.getJobNo(),
                 App.fullAddress,
-                remark.getText().toString(),
+                Util.replaceEscapeChr(remark.getText().toString()),
                 "Passenger No Show"
         );
 
@@ -424,6 +467,7 @@ public class JobDetailFragment extends AbstractFragment {
                 dialog.dismiss();
                 getActivity().finish();
                 EventBus.getDefault().postSticky("UPDATE_JOB_COUNT");
+
             }
 
             @Override
@@ -438,7 +482,7 @@ public class JobDetailFragment extends AbstractFragment {
         Call<JobRes> call = RestClient.COACH().getApiService().UpdateCompletJob(
                 job.getJobNo(),
                 App.fullAddress,
-                remark.getText().toString(),
+                Util.replaceEscapeChr(remark.getText().toString()),
                 "Completed"
         );
 
@@ -491,7 +535,7 @@ public class JobDetailFragment extends AbstractFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CAMERA_IMAGE && resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             try {
 
                 Bundle extras = data.getExtras();
@@ -511,9 +555,27 @@ public class JobDetailFragment extends AbstractFragment {
 
                 InputStream inputStream = getActivity().getContentResolver().openInputStream(tempUri);
 
-                FtpHelper.uploadTask async = new FtpHelper.uploadTask(getContext(), inputStream);
-                async.execute(App.FTP_URL, App.FTP_USER, App.FTP_PASSWORD, App.FTP_DIR, job.getBookNo() + ".jpg", job.getJobNo(), "PHOTO");   //Passing arguments to AsyncThread
 
+                // FTP Uploading
+                FtpHelper.uploadTask async = new FtpHelper.uploadTask(getContext(), inputStream);
+
+                if (requestCode == REQUEST_SHOW_CAMERA)
+                    async.execute(App.FTP_URL,
+                            App.FTP_USER,
+                            App.FTP_PASSWORD,
+                            App.FTP_DIR,
+                            job.getJobNo() + "_show.jpg",
+                            job.getJobNo(),
+                            "SHOW");   //Passing arguments to AsyncThread
+
+                if (requestCode == REQUEST_NO_SHOW_CAMERA)
+                    async.execute(App.FTP_URL,
+                            App.FTP_USER,
+                            App.FTP_PASSWORD,
+                            App.FTP_DIR,
+                            job.getJobNo() + "_no_show.jpg",
+                            job.getJobNo(),
+                            "NOSHOW");
 
             } catch (Exception e) {
                 Log.e("Camera Error : ", e.getLocalizedMessage().toString());
@@ -522,14 +584,23 @@ public class JobDetailFragment extends AbstractFragment {
     }
 
 
-    public void openCamera(final String fileName, final String jobNo) {
+    public void openCamera(final int requestCode, final String jobNo) {
+
 
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent("android.media.Action.IMAGE_CAPTURE");
-                intent.putExtra("filename", fileName);
-                startActivityForResult(intent, REQUEST_CAMERA_IMAGE);
+
+//                File f = new File(Environment.getExternalStorageDirectory(), "temp.jpg");
+//                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                intent.putExtra(MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(MainActivity.this, AUTHORITY, f));
+//                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                //Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                //intent.putExtra("filename", fileName);
+                startActivityForResult(intent, requestCode);
             }
         });
     }
@@ -567,11 +638,11 @@ public class JobDetailFragment extends AbstractFragment {
 
     private void displayUpdateStatus(String status) {
         job.setJobStatus(status);
-       displayJobDetail();
+        displayJobDetail();
     }
 
     private void displayJobDetail() {
-        mJobNo.setText(job.getBookNo());
+        mJobNo.setText(job.getJobNo());
         mJobType.setText(job.getJobType());
         mJobStatus.setText(job.getJobStatus());
         mDate.setText(job.getUsageDate());
@@ -582,7 +653,7 @@ public class JobDetailFragment extends AbstractFragment {
         mETA.setText("");
         mPickup.setText(job.getPickUp());
         mDropOff.setText(job.getDestination());
-        mRemarks.setText("");
+        mRemarks.setText(job.getRemarks());
 
         mItinerary.setVisibility((job.getFile1().isEmpty()) ? View.GONE : View.VISIBLE);
     }
@@ -607,9 +678,19 @@ public class JobDetailFragment extends AbstractFragment {
 
         // build custom tabs intent
         CustomTabsIntent customTabsIntent = intentBuilder.build();
+        customTabsIntent.intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         // launch the url
         customTabsIntent.launchUrl(getActivity().getBaseContext(), uri);
+
+
+//        CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder().build();
+//        CustomTabActivityHelper.openCustomTab(
+//                this,// activity
+//                customTabsIntent,
+//                Uri.parse("http://www.google.com"),
+//                new WebviewFallback()
+//        );
 
     }
 
@@ -629,8 +710,9 @@ public class JobDetailFragment extends AbstractFragment {
 
         Call<JobRes> call = RestClient.COACH().getApiService().UpdateJobStatus(
                 job.getJobNo(),
-                status,
-                App.fullAddress
+                App.fullAddress,
+                status
+
         );
 
         call.enqueue(new Callback<JobRes>() {
@@ -642,6 +724,11 @@ public class JobDetailFragment extends AbstractFragment {
                 Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
 
                 displayUpdateStatus(status);
+
+                EventBus.getDefault().postSticky("UPDATE_JOB_COUNT");
+
+                if (status.equalsIgnoreCase("REJECTED"))
+                    getActivity().finish();
             }
 
             @Override
@@ -670,12 +757,9 @@ public class JobDetailFragment extends AbstractFragment {
     public void showNavAppSelectionDialog(final double lat, final double lng, final String address) {
         Button mGoogleMap, mWaze;
 
-
-
-        final Dialog dialog = new Dialog(getContext() );
+        final Dialog dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.dialog_navigation_app_selection);
-        dialog.setTitle("App Selection");
-
+        dialog.setTitle("");
 
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
         lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
@@ -702,12 +786,14 @@ public class JobDetailFragment extends AbstractFragment {
             mWaze.setVisibility(View.GONE);
 
 
+        //final String tmpAddress = "Silver Green Hotel, No.9 ANawYaHtar Road, Yangon";
+
         mGoogleMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dialog.dismiss();
                 if (hasGoogleMap())
-                    showRouteOnGoogleMap(lat, lng);
+                    getGeocodingAndRoute("GMAP", address);
                 else
                     gotoPlayStore("com.google.android.apps.maps");
 
@@ -720,7 +806,7 @@ public class JobDetailFragment extends AbstractFragment {
             public void onClick(View v) {
                 dialog.dismiss();
                 if (hasWaze())
-                    showRouteOnWaze(lat, lng, address);
+                    getGeocodingAndRoute("WAZE", address);
                 else
                     gotoPlayStore("com.waze");
             }
@@ -755,23 +841,36 @@ public class JobDetailFragment extends AbstractFragment {
         }
     }
 
+    private void getGeocodingAndRoute(String provider, String address) {
+        GeocodingLocation locationAddress = new GeocodingLocation();
 
-    public void showRouteOnGoogleMap(double lat, double lng) {
+        GeocoderHandler geocoderHandler = new GeocoderHandler();
+        geocoderHandler.provider = provider;
+
+        locationAddress.getAddressFromLocation(address,
+                getContext(), geocoderHandler);
+
+    }
+
+    public void showRouteOnGoogleMap(String address) {
         String uri = "http://maps.google.com/maps?saddr=" +
                 App.location.getLatitude() + "," +
                 App.location.getLongitude() + "&daddr=" +
-                lat + "," + lng;
+                address;
 
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
         intent.setPackage("com.google.android.apps.maps");
         startActivity(intent);
     }
 
-    public void showRouteOnWaze(double lat, double lng, String address) {
+
+    public void showRouteOnWaze(String address, Location location) {
 //        String uri = "waze://?ll=" + lat + "," + lng +
 //                "&navigate=yes";
 
-        String uri = "https://waze.com/ul?q=" + address +
+        String uri = "https://waze.com/ul?q=" + address + "&ll=" +
+                location.getLatitude() + "," +
+                location.getLongitude() +
                 "&navigate=yes";
 
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
@@ -790,7 +889,109 @@ public class JobDetailFragment extends AbstractFragment {
 
     @Subscribe(sticky = false)
     public void onEvent(Action action) {
-        Toast.makeText(getContext(), action.getAction() + " " + action.getJobNo(), Toast.LENGTH_SHORT).show();
+//        // Toast.makeText(getContext(), action.getAction() + " " + action.getJobNo(), Toast.LENGTH_SHORT).show();
+//        if (job.getJobNo().equals(action.getJobNo())) {
+//
+//            getActivity().runOnUiThread(new Runnable() {
+//                public void run() {
+//                    showCustomAlertDialog();
+//                }
+//            });
+//        }
+    }
+
+
+    private void showCustomAlertDialog() {
+
+        dialog = new Dialog(getContext());
+
+        dialog.setContentView(R.layout.dialog_message);
+        dialog.setTitle("");
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        TextView title = dialog.findViewById(R.id.title);
+        Button ok = dialog.findViewById(R.id.ok);
+
+        title.setText("MY COACH");
+
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                getActivity().finish();
+            }
+        });
+
+        // resize dialog
+        Rect displayRectangle = new Rect();
+        Window window = getActivity().getWindow();
+        window.getDecorView().getWindowVisibleDisplayFrame(displayRectangle);
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.copyFrom(dialog.getWindow().getAttributes());
+        lp.width = (int) (displayRectangle.width() * 0.85f);
+
+        dialog.show();
+        dialog.getWindow().setAttributes(lp);
+    }
+
+
+    private void callJobDetail() {
+        Call<JobRes> call = RestClient.COACH().getApiService().GetJobDetails(
+                job.getJobNo()
+        );
+
+        call.enqueue(new Callback<JobRes>() {
+            @Override
+            public void onResponse(Call<JobRes> call, Response<JobRes> response) {
+                if (response.body().getJobdetails() != null)
+                    job = response.body().getJobdetails();
+            }
+
+            @Override
+            public void onFailure(Call<JobRes> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private class GeocoderHandler extends Handler {
+        Double lat, lng;
+        String address = "";
+        public String provider = "";
+        Location location = new Location("MyProvider");
+
+        @Override
+        public void handleMessage(Message message) {
+
+            switch (message.what) {
+                case 1:
+                    Bundle bundle = message.getData();
+                    address = bundle.getString("address");
+
+                    String[] loc = address.split(":");
+
+                    address = loc[1].split("\n")[0];
+                    loc = loc[2].split("\n");
+
+                    location.setLatitude(Double.valueOf(loc[1]));
+                    location.setLongitude(Double.valueOf(loc[2]));
+
+                    if (provider.equalsIgnoreCase("WAZE"))
+                        showRouteOnWaze(address, location);
+
+                    if (provider.equalsIgnoreCase("GMAP"))
+                        showRouteOnGoogleMap(address);
+
+                    Log.e("LOC : ", loc[1].toString());
+
+                    break;
+                default:
+                    location = null;
+            }
+
+        }
+
     }
 
 }

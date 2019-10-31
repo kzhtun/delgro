@@ -11,6 +11,12 @@ import retrofit2.http.Path;
 
 public interface APIService {
 
+    @GET("saveshowpic/{jobno},{filename}")
+    Call<JobRes> SaveShowPic(@Path("jobno") String jobno, @Path("filename") String filename);
+
+    @GET("savenoshowpic/{jobno},{filename}")
+    Call<JobRes> SaveNoShowPic(@Path("jobno") String jobno, @Path("filename") String filename);
+
     @GET("validatedriver/{user}")
     Call<ObjectRes> ValidateDriver(@Path("user") String user);
 
@@ -23,17 +29,23 @@ public interface APIService {
     @GET("getTodayJobsList")
     Call<JobRes> GetTodayJobs();
 
+    @GET("confirmjobreminder/{jobno}")
+    Call<JobRes> ConfirmJobReminder(@Path("jobno") String jobno);
+
+    @GET("getJobDetails/{jobno}")
+    Call<JobRes> GetJobDetails(@Path("jobno") String jobno);
+
     @GET("getTomorrowJobsList")
     Call<JobRes> GetTomorrowJobs();
 
     @GET("getFutureJobsList/{date},{passenger},{sort}")
     Call<JobRes> GetFutureJobs(@Path("date") String date, @Path("passenger") String passenger, @Path("sort") String sort);
 
-    @GET("getHistoryJobsList/{date},{passenger}")
-    Call<JobRes> GetHistoryJobs(@Path("date") String date, @Path("passenger") String passenger);
+    @GET("getHistoryJobsList/{date},{passenger},{addparam}")
+    Call<JobRes> GetHistoryJobs(@Path("date") String date, @Path("passenger") String passenger,@Path("addparam") String addparam );
 
     @GET("updateJobStatus/{jobno},{address},{status}")
-    Call<JobRes> UpdateJobStatus(@Path("jobno") String jobno, @Path("status") String status, @Path("address") String address);
+    Call<JobRes> UpdateJobStatus(@Path("jobno") String jobno, @Path("address") String address, @Path("status") String status);
 
     @GET("updateShowConfirmJob/{jobno},{address},{remarks},{status}")
     Call<JobRes> UpdateShowConfirmJob(@Path("jobno") String jobno,  @Path("address") String address,@Path("remarks") String remarks, @Path("status") String status);

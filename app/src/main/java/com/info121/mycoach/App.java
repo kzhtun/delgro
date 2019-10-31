@@ -19,6 +19,8 @@ import com.google.firebase.iid.InstanceIdResult;
 import com.info121.mycoach.models.Job;
 import com.info121.mycoach.utils.PrefDB;
 
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +34,7 @@ public class App extends Application {
 
     public static String CONST_REST_API_URL = "http://alexisinfo121.noip.me:83/RestAPICoach/MyLimoService.svc/";
     public static String CONST_PDF_URL = "http://alexisinfo121.noip.me:83/iopscoach/uploads/";
-
-
-
+    public static String CONST_PHOTO_URL = "http://alexisinfo121.noip.me/IOPS/images/mycoachpics/";
 
     public static String CONST_USER_NAME = "USER_NAME";
     public static String CONST_ALREADY_LOGIN = "ALREADY_LOGIN";
@@ -97,6 +97,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
                         .setDefaultFontPath("fonts/Lato-Regular.ttf")

@@ -86,7 +86,7 @@ public class Util {
     }
 
     public static String getVersionName(Context context) {
-        String versionName ="";
+        String versionName = "";
         try {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
             versionName = packageInfo.versionName;
@@ -98,9 +98,17 @@ public class Util {
     }
 
 
-
-    private int convertPxToDp(int px){
-        return Math.round(px/(Resources.getSystem().getDisplayMetrics().xdpi/ DisplayMetrics.DENSITY_DEFAULT));
+    private int convertPxToDp(int px) {
+        return Math.round(px / (Resources.getSystem().getDisplayMetrics().xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
+
+
+    public static String replaceEscapeChr(String str) {
+        if (str.length() > 0)
+            return str.replace(",", "###");
+        else
+            return " ";
+    }
+
 
 }
