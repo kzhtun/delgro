@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#19191D</color>
-    <color name="colorPrimaryDark">#0F0F11</color>
-    <color name="colorAccent">#00ACFF</color>
+    <color name="colorPrimary">#00355C</color>
+    <color name="colorPrimaryDark">#00243D</color>
+    <color name="colorAccent">#ef631a</color>
 
-    <color name="divider">#2C3146</color>
-    <color name="green">#4cae00</color>
+    <color name="divider">#A5A5A5</color>
+    <color name="green">#3C8D00</color>
     <color name="dark_green">#3d8c00</color>
     <color name="cyan">#008cd2</color>
     <color name="dark_cyan">#008cd2</color>
     <color name="yellow">#FFD500</color>
     <color name="black">#000000</color>
-    <color name="orange">#F5A01A</color>
+    <color name="orange">#EB7A00</color>
     <color name="red">#FF0000</color>
     <color name="dark_red">#CF0000</color>
     <color name="jet">#222222</color>
@@ -28,13 +28,27 @@
     <color name="accept">#0DAA00</color>
     <color name="reject">#FF1400</color>
 
-    <color name="layout">#1E1E24</color>
-    <color name="layout_light">#25252C</color>
+    <color name="layout">#EEEEEE</color>
+    <color name="layout_stroke">#C9DBEB</color>
+    <color name="layout_light">#C9DBEB</color>
+
+    <color name="edit_text_color">#262A33</color>
+    <color name="edit_text_background">#D7E4EE</color>
 
 
-    <color name="cell_text">#FFFFFF</color>
-    <color name="cell_label">#008cd2</color>
-    <color name="cell_label_dark">#002C50</color>
+    <color name="background">#A4BACF</color>
+
+
+    <color name="default_button">#00ACFF</color>
+    <color name="default_button_stroke">#00ACFF</color>
+
+    <color name="normal_button">#004881</color>
+    <color name="normal_button_stroke">#004881</color>
+
+
+    <color name="cell_text">#525252</color>
+    <color name="cell_label">#0065B6</color>
+    <color name="cell_label_dark">#004881</color>
 
 
 </resources>

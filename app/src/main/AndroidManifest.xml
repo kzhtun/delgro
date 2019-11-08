@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.info121.mycoach">
+    package="com.info121.delgro">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -23,7 +23,7 @@
 
 
     <application
-        android:name="com.info121.mycoach.App"
+        android:name="com.info121.delgro.App"
         tools:replace="android:allowBackup"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
@@ -46,14 +46,14 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
-        <service android:name="com.info121.mycoach.services.SmartLocationService" />
+        <service android:name="com.info121.delgro.services.SmartLocationService" />
 
 
         <activity android:name=".activities.ToneSelection" />
-        <activity android:name="com.info121.mycoach.activities.JobDetailActivity"></activity>
-        <activity android:name="com.info121.mycoach.activities.JobOverviewActivity" />
-        <activity android:name="com.info121.mycoach.activities.LoginActivity" />
-        <activity android:name="com.info121.mycoach.activities.MainActivity">
+        <activity android:name="com.info121.delgro.activities.JobDetailActivity"></activity>
+        <activity android:name="com.info121.delgro.activities.JobOverviewActivity" />
+        <activity android:name="com.info121.delgro.activities.LoginActivity" />
+        <activity android:name="com.info121.delgro.activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
