@@ -1,9 +1,8 @@
-package com.info121.mycoach.api;
+package com.info121.titalimo.api;
 
 
-import com.info121.mycoach.models.JobRes;
-import com.info121.mycoach.models.ObjectRes;
-
+import com.info121.titalimo.models.JobRes;
+import com.info121.titalimo.models.ObjectRes;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -11,14 +10,25 @@ import retrofit2.http.Path;
 
 public interface APIService {
 
+
+    @GET("getcurrentversion/AndriodV-{version}")
+    Call<ObjectRes> CheckVersion(@Path("version") String version);
+
     @GET("saveshowpic/{jobno},{filename}")
     Call<JobRes> SaveShowPic(@Path("jobno") String jobno, @Path("filename") String filename);
+
+    @GET("savesignature/{jobno},{filename}")
+    Call<JobRes> SaveSignature(@Path("jobno") String jobno, @Path("filename") String filename);
 
     @GET("savenoshowpic/{jobno},{filename}")
     Call<JobRes> SaveNoShowPic(@Path("jobno") String jobno, @Path("filename") String filename);
 
     @GET("validatedriver/{user}")
     Call<ObjectRes> ValidateDriver(@Path("user") String user);
+
+    @GET("getdrivercurrentlocation/{latitude},{longitude},{status},{address}")
+    Call<JobRes> UpdateDriverLocation(@Path("latitude") String latitude, @Path("longitude") String longitude, @Path("status") int status, @Path("address") String addresss);
+
 
     @GET("updatedevice/{deviceId},{platform},{fcm_token}")
     Call<ObjectRes> UpdateDevice(@Path("deviceId") String deviceId, @Path("platform") String platform, @Path("fcm_token") String fcm_token);
@@ -42,19 +52,19 @@ public interface APIService {
     Call<JobRes> GetFutureJobs(@Path("date") String date, @Path("passenger") String passenger, @Path("sort") String sort);
 
     @GET("getHistoryJobsList/{date},{passenger},{addparam}")
-    Call<JobRes> GetHistoryJobs(@Path("date") String date, @Path("passenger") String passenger,@Path("addparam") String addparam );
+    Call<JobRes> GetHistoryJobs(@Path("date") String date, @Path("passenger") String passenger, @Path("addparam") String addparam);
 
     @GET("updateJobStatus/{jobno},{address},{status}")
     Call<JobRes> UpdateJobStatus(@Path("jobno") String jobno, @Path("address") String address, @Path("status") String status);
 
     @GET("updateShowConfirmJob/{jobno},{address},{remarks},{status}")
-    Call<JobRes> UpdateShowConfirmJob(@Path("jobno") String jobno,  @Path("address") String address,@Path("remarks") String remarks, @Path("status") String status);
+    Call<JobRes> UpdateShowConfirmJob(@Path("jobno") String jobno, @Path("address") String address, @Path("remarks") String remarks, @Path("status") String status);
 
     @GET("updateNoShowJob/{jobno},{address},{remarks},{status}")
-    Call<JobRes> UpdateNoShowConfirmJob(@Path("jobno") String jobno,  @Path("address") String address,@Path("remarks") String remarks, @Path("status") String status);
+    Call<JobRes> UpdateNoShowConfirmJob(@Path("jobno") String jobno, @Path("address") String address, @Path("remarks") String remarks, @Path("status") String status);
 
     @GET("updateCompleteJob/{jobno},{address},{remarks},{status}")
-    Call<JobRes> UpdateCompletJob(@Path("jobno") String jobno,  @Path("address") String address,@Path("remarks") String remarks, @Path("status") String status);
+    Call<JobRes> UpdateCompletJob(@Path("jobno") String jobno, @Path("address") String address, @Path("remarks") String remarks, @Path("status") String status);
 
 //    //amad,123,android,241jlksfljsaf
 //    @GET("updatedriverdetail/{user},{deviceId},{deviceType},{fcm_token}")

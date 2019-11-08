@@ -1,4 +1,4 @@
-package com.info121.mycoach;
+package com.info121.titalimo;
 
 import android.support.v4.app.Fragment;
 import android.util.Log;

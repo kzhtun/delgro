@@ -1,4 +1,4 @@
-package com.info121.mycoach.models;
+package com.info121.titalimo.models;
 
 public class ObjectRes{
 	private Object jobcount;

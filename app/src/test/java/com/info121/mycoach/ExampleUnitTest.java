@@ -1,4 +1,4 @@
-package com.info121.mycoach;
+package com.info121.titalimo;
 
 import org.junit.Test;
 

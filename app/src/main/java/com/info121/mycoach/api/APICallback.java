@@ -1,4 +1,4 @@
-package com.info121.mycoach.api;
+package com.info121.titalimo.api;
 
 import android.util.Log;
 
@@ -7,7 +7,6 @@ import org.greenrobot.eventbus.EventBus;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
 
 
 public abstract class APICallback<T> implements Callback<T> {

@@ -1,10 +1,9 @@
-package com.info121.mycoach.api;
+package com.info121.titalimo.api;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.info121.mycoach.App;
-
+import com.info121.titalimo.App;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

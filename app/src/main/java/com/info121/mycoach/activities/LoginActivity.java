@@ -1,4 +1,4 @@
-package com.info121.mycoach.activities;
+package com.info121.titalimo.activities;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,6 +7,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
@@ -19,15 +20,16 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.info121.mycoach.AbstractActivity;
-import com.info121.mycoach.App;
-import com.info121.mycoach.R;
-import com.info121.mycoach.api.RestClient;
-import com.info121.mycoach.models.ObjectRes;
-import com.info121.mycoach.services.SmartLocationService;
-import com.info121.mycoach.utils.GeocodingLocation;
-import com.info121.mycoach.utils.PrefDB;
-import com.info121.mycoach.utils.Util;
+import com.info121.titalimo.AbstractActivity;
+import com.info121.titalimo.App;
+import com.info121.titalimo.R;
+import com.info121.titalimo.activities.JobOverviewActivity;
+import com.info121.titalimo.api.RestClient;
+import com.info121.titalimo.models.ObjectRes;
+import com.info121.titalimo.services.SmartLocationService;
+import com.info121.titalimo.utils.GeocodingLocation;
+import com.info121.titalimo.utils.PrefDB;
+import com.info121.titalimo.utils.Util;
 
 import java.io.IOException;
 import java.util.List;
@@ -67,6 +69,8 @@ public class LoginActivity extends AbstractActivity {
             mRemember.setChecked(true);
         }
 
+        callCheckVersion();
+
     }
 
 
@@ -103,6 +107,24 @@ public class LoginActivity extends AbstractActivity {
                 mUserName.setError("Error in connection.");
                 mUserName.requestFocus();
                 mProgressBar.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void callCheckVersion(){
+        Call<ObjectRes> call = RestClient.COACH().getApiService().CheckVersion(String.valueOf(Util.getVersionCode(mContext)));
+
+        call.enqueue(new Callback<ObjectRes>() {
+            @Override
+            public void onResponse(Call<ObjectRes> call, Response<ObjectRes> response) {
+                if(response.body().getResponsemessage().equalsIgnoreCase("OUTDATED")) {
+                    showOutdatedDialog();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ObjectRes> call, Throwable t) {
+
             }
         });
     }
@@ -198,5 +220,37 @@ public class LoginActivity extends AbstractActivity {
             return false;
         } else
             return true;
+    }
+
+
+    private void showOutdatedDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(mContext)
+                .setTitle(R.string.AppName)
+                .setMessage(R.string.message_version_outdated)
+                .setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finishAffinity();
+                    }
+                })
+                .setNegativeButton("Go to Play Store", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finishAffinity();
+                        final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                        try {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                        } catch (android.content.ActivityNotFoundException anfe) {
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                        }
+                    }
+                })
+                .create();
+
+
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
     }
 }

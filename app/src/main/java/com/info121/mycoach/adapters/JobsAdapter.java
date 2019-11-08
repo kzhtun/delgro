@@ -1,4 +1,4 @@
-package com.info121.mycoach.adapters;
+package com.info121.titalimo.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,10 +12,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.info121.mycoach.App;
-import com.info121.mycoach.R;
-import com.info121.mycoach.activities.JobDetailActivity;
-import com.info121.mycoach.models.Job;
+import com.info121.titalimo.R;
+import com.info121.titalimo.App;
+import com.info121.titalimo.activities.JobDetailActivity;
+import com.info121.titalimo.models.Job;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,10 +28,11 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.ViewHolder> {
 
     private Context mContext;
     List<Job> mJobList = new ArrayList<>();
+    private String mCurrentTab = "";
 
-
-    public void updateJobList( List<Job> jobList){
+    public void updateJobList(List<Job> jobList, String currentTab) {
         mJobList = jobList;
+        mCurrentTab = currentTab;
     }
 
     public JobsAdapter(Context mContext, List<Job> mJobList) {
@@ -46,7 +47,7 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.ViewHolder> {
         LayoutInflater inflater = LayoutInflater.from(mContext);
 
         // Inflate the custom layout
-        View promotionView = inflater.inflate(R.layout.cell_job , parent, false);
+        View promotionView = inflater.inflate(R.layout.cell_job, parent, false);
 
         // Return a new holder instance
         return new ViewHolder(promotionView);
@@ -71,28 +72,29 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.ViewHolder> {
 
         //viewHolder.passenger.setText(mJobList.get(i).getJobNo());
 
-        final  String jobNo =  mJobList.get(i).getJobNo();
+        final String jobNo = mJobList.get(i).getJobNo();
         final int index = i;
 
-        viewHolder.parent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        if (!mCurrentTab.equalsIgnoreCase("HISTORY"))
+            viewHolder.parent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                App.jobList = mJobList;
+                    App.jobList = mJobList;
 
-                Intent intent = new Intent(mContext, JobDetailActivity.class);
-                intent.putExtra("jobNo",  jobNo);
-                intent.putExtra("index",  index);
-                mContext.startActivity(intent);
+                    Intent intent = new Intent(mContext, JobDetailActivity.class);
+                    intent.putExtra("jobNo", jobNo);
+                    intent.putExtra("index", index);
+                    mContext.startActivity(intent);
 
-            }
-        });
+                }
+            });
 
     }
 
     @Override
     public int getItemCount() {
-        return  (mJobList==null)? 0 : mJobList.size();
+        return (mJobList == null) ? 0 : mJobList.size();
     }
 
 
@@ -106,7 +108,7 @@ public class JobsAdapter extends RecyclerView.Adapter<JobsAdapter.ViewHolder> {
     }
 
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.job_type)
         TextView jobType;
 

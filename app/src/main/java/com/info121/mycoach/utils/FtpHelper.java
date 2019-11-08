@@ -1,6 +1,5 @@
-package com.info121.mycoach.utils;
+package com.info121.titalimo.utils;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
@@ -12,10 +11,8 @@ import android.provider.MediaStore;
 import android.widget.Toast;
 
 import com.adeel.library.easyFTP;
-import com.info121.mycoach.App;
-import com.info121.mycoach.api.RestClient;
-import com.info121.mycoach.models.JobRes;
-
+import com.info121.titalimo.api.RestClient;
+import com.info121.titalimo.models.JobRes;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -163,6 +160,9 @@ public class FtpHelper {
                     if (mType.equalsIgnoreCase("NOSHOW"))
                         callSaveNoShowPhoto(context, mJobNo, mFileName);
 
+                    if (mType.equalsIgnoreCase("SIGNATURE"))
+                        callSaveSignature(context, mJobNo, mFileName);
+
 
                 }
             }, 2000);
@@ -246,7 +246,6 @@ public class FtpHelper {
         });
     }
 
-
     private static void callSaveNoShowPhoto(final Context context, String jobNo, String fileName) {
         Call<JobRes> call = RestClient.COACH().getApiService().SaveNoShowPic(
                 jobNo,
@@ -263,6 +262,26 @@ public class FtpHelper {
             @Override
             public void onFailure(Call<JobRes> call, Throwable t) {
                 Toast.makeText(context, "No show save failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private static void callSaveSignature(final Context context, String jobNo, String fileName) {
+        Call<JobRes> call = RestClient.COACH().getApiService().SaveSignature(
+                jobNo,
+                fileName
+        );
+
+
+        call.enqueue(new Callback<JobRes>() {
+            @Override
+            public void onResponse(Call<JobRes> call, Response<JobRes> response) {
+                Toast.makeText(context, "Signature save successful", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<JobRes> call, Throwable t) {
+                Toast.makeText(context, "Signature save failed", Toast.LENGTH_SHORT).show();
             }
         });
     }

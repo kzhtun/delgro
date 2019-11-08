@@ -1,4 +1,4 @@
-package com.info121.mycoach.activities;
+package com.info121.titalimo.activities;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -18,10 +18,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-import com.info121.mycoach.R;
-import com.info121.mycoach.api.RestClient;
-import com.info121.mycoach.models.JobRes;
+import com.info121.titalimo.R;
+import com.info121.titalimo.api.RestClient;
+import com.info121.titalimo.models.JobRes;
 
 import java.util.ArrayList;
 import java.util.List;

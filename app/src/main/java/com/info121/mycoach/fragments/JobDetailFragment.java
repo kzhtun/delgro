@@ -1,11 +1,14 @@
-package com.info121.mycoach.fragments;
+package com.info121.titalimo.fragments;
 
-import android.app.AlertDialog;
+import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
@@ -13,19 +16,17 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.customtabs.CustomTabsIntent;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -37,27 +38,30 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.info121.mycoach.AbstractFragment;
-import com.info121.mycoach.App;
-import com.info121.mycoach.R;
-import com.info121.mycoach.api.RestClient;
-import com.info121.mycoach.models.Action;
-import com.info121.mycoach.models.Job;
-import com.info121.mycoach.models.JobRes;
-import com.info121.mycoach.utils.FtpHelper;
-import com.info121.mycoach.utils.GeocodingLocation;
-import com.info121.mycoach.utils.Util;
+import com.github.gcacace.signaturepad.views.SignaturePad;
+import com.info121.titalimo.R;
+import com.info121.titalimo.AbstractFragment;
+import com.info121.titalimo.App;
+import com.info121.titalimo.api.RestClient;
+import com.info121.titalimo.models.Action;
+import com.info121.titalimo.models.Job;
+import com.info121.titalimo.models.JobRes;
+import com.info121.titalimo.utils.FtpHelper;
+import com.info121.titalimo.utils.GeocodingLocation;
+import com.info121.titalimo.utils.Util;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
-
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalTime;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -67,11 +71,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
-import static com.info121.mycoach.utils.FtpHelper.getImageUri;
-import static com.info121.mycoach.utils.FtpHelper.getRealPathFromURI;
+import static android.view.View.GONE;
+import static com.info121.titalimo.utils.FtpHelper.getImageUri;
+import static com.info121.titalimo.utils.FtpHelper.getRealPathFromURI;
 
 
 public class JobDetailFragment extends AbstractFragment {
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private static String[] PERMISSIONS_STORAGE = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
     Job job;
     private static final int REQUEST_SHOW_CAMERA = 2001;
     private static final int REQUEST_NO_SHOW_CAMERA = 2002;
@@ -127,6 +135,12 @@ public class JobDetailFragment extends AbstractFragment {
     @BindView(R.id.itinerary)
     Button mItinerary;
 
+
+    TextView photoLabel, signatureLabel, clear, done;
+    ImageView addPhoto, passengerPhoto;
+    SignaturePad signaturePad;
+
+
     Boolean visible = false;
 
     public JobDetailFragment() {
@@ -159,15 +173,20 @@ public class JobDetailFragment extends AbstractFragment {
 
         if (job.getJobStatus().equalsIgnoreCase("JOB ASSIGNED")) {
             mAssignLayout.setVisibility(View.VISIBLE);
-            mUpdateLayout.setVisibility(View.GONE);
+            mUpdateLayout.setVisibility(GONE);
         } else {
-            mAssignLayout.setVisibility(View.GONE);
+            mAssignLayout.setVisibility(GONE);
             mUpdateLayout.setVisibility(View.VISIBLE);
         }
+
 
         return view;
     }
 
+    @OnClick(R.id.flight_no)
+    public void flightNoOnClick() {
+        showFlightAppsDialog();
+    }
 
     @OnClick(R.id.layout_pickup)
     public void pickUpOnClick() {
@@ -276,8 +295,108 @@ public class JobDetailFragment extends AbstractFragment {
 
         dialog.show();
 
-        //  dialog
+        // call update driver location when dialog dismiss
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                callUpdateDriverLocation();
+            }
+        });
 
+    }
+
+    private void callUpdateDriverLocation() {
+        if (App.gpsStatus == 0) return;
+
+
+        Call<JobRes> call = RestClient.COACH().getApiService().UpdateDriverLocation(
+                String.valueOf(App.location.getLatitude()),
+                String.valueOf(App.location.getLongitude()),
+                App.gpsStatus,
+                App.fullAddress
+        );
+
+        call.enqueue(new Callback<JobRes>() {
+            @Override
+            public void onResponse(Call<JobRes> call, Response<JobRes> response) {
+                Log.e("Update Driver Location", " Success");
+            }
+
+            @Override
+            public void onFailure(Call<JobRes> call, Throwable t) {
+                Log.e("Update Driver Location", " Failed");
+            }
+        });
+    }
+
+    private void showFlightAppsDialog() {
+
+        final String package_changi = "com.changiairport.cagapp";
+        final String package_flight_rader = "com.flightradar24free";
+        final String package_flight_aware = "com.flightaware.android.liveFlightTracker";
+
+        final Dialog dialog = new Dialog(getContext());
+        dialog.setContentView(R.layout.dialog_flight_app_selection);
+        dialog.setTitle("App Selection");
+
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        Window window = dialog.getWindow();
+        window.setAttributes(lp);
+        window.setGravity(Gravity.CENTER);
+
+        //adding dialog animation sliding up and down
+        // dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+
+        // to cancel when outside touch
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.setCancelable(true);
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation_Fade;
+
+        // window.setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
+
+        LinearLayout mAppListContainer = (LinearLayout) dialog.findViewById(R.id.app_list);
+        Button mChangi = (Button) dialog.findViewById(R.id.btn_ichangi);
+        Button mFlightRader = (Button) dialog.findViewById(R.id.btn_flight_rader);
+        Button mFlightAware = (Button) dialog.findViewById(R.id.btn_flight_aware);
+
+
+        mChangi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchApp(package_changi);
+                dialog.dismiss();
+            }
+        });
+
+        mFlightRader.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchApp(package_flight_rader);
+                dialog.dismiss();
+            }
+        });
+
+        mFlightAware.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                launchApp(package_flight_aware);
+                dialog.dismiss();
+            }
+        });
+
+
+        dialog.show();
+
+    }
+
+    private void launchApp(String appPackageName) {
+        Intent launchIntent = getContext().getPackageManager().getLaunchIntentForPackage(appPackageName);
+        if (launchIntent != null) {
+            startActivity(launchIntent);//null pointer check in case package name was not found
+        } else
+            gotoPlayStore(appPackageName);
     }
 
     private void showCompleteDialog() {
@@ -377,11 +496,19 @@ public class JobDetailFragment extends AbstractFragment {
         dialog.setTitle("");
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+
+        // Inititalize Label
+        clear = dialog.findViewById(R.id.clear);
+        done = dialog.findViewById(R.id.done);
+        photoLabel = dialog.findViewById(R.id.photo_label);
+        signatureLabel = dialog.findViewById(R.id.signature_label);
+        signaturePad = dialog.findViewById(R.id.signature_pad);
+        addPhoto = dialog.findViewById(R.id.add_photo);
+        passengerPhoto = dialog.findViewById(R.id.passenger_photo);
         TextView title = dialog.findViewById(R.id.title);
         TextView label = dialog.findViewById(R.id.photo_label);
         TextView remarks = dialog.findViewById(R.id.remarks);
-        ImageView addPhoto = dialog.findViewById(R.id.add_photo);
-        ImageView passengerPhoto = dialog.findViewById(R.id.passenger_photo);
+
         Button save = dialog.findViewById(R.id.save);
 
         title.setText("PASSENGER ON BOARD");
@@ -404,6 +531,23 @@ public class JobDetailFragment extends AbstractFragment {
             }
         });
 
+
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signaturePad.clear();
+            }
+        });
+
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Bitmap signatureBitmap = signaturePad.getSignatureBitmap();
+                saveSignature(signatureBitmap);
+            }
+        });
+
+
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -420,8 +564,51 @@ public class JobDetailFragment extends AbstractFragment {
         lp.copyFrom(dialog.getWindow().getAttributes());
         lp.width = (int) (displayRectangle.width() * 0.85f);
 
+
+        togglePlaceHolder(1);
+
+        photoLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                togglePlaceHolder(1);
+            }
+        });
+
+        signatureLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                togglePlaceHolder(2);
+            }
+        });
+
         dialog.show();
         dialog.getWindow().setAttributes(lp);
+    }
+
+    private void togglePlaceHolder(int tab) {
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        if (tab == 1) {
+            addPhoto.setVisibility(View.VISIBLE);
+            passengerPhoto.setVisibility(View.VISIBLE);
+            signaturePad.setVisibility(GONE);
+            clear.setVisibility(View.GONE);
+            done.setVisibility(View.GONE);
+
+            //photoLabel.setLayoutParams(params);
+            photoLabel.setTextColor(ContextCompat.getColor(getContext(), R.color.cell_label));
+            signatureLabel.setTextColor(ContextCompat.getColor(getContext(), R.color.aluminum));
+        } else {
+            addPhoto.setVisibility(GONE);
+            passengerPhoto.setVisibility(GONE);
+            signaturePad.setVisibility(View.VISIBLE);
+            clear.setVisibility(View.VISIBLE);
+            done.setVisibility(View.VISIBLE);
+
+            // signatureLabel.setLayoutParams(params);
+            photoLabel.setTextColor(ContextCompat.getColor(getContext(), R.color.aluminum));
+            signatureLabel.setTextColor(ContextCompat.getColor(getContext(), R.color.cell_label));
+        }
     }
 
     private void callUpdateShowPassenger() {
@@ -649,13 +836,13 @@ public class JobDetailFragment extends AbstractFragment {
         mTime.setText(job.getPickUpTime());
         mPassenger.setText(job.getCustomer());
         mMobile.setText(job.getCustomerTel());
-        mFlightNo.setText("");
-        mETA.setText("");
+        mFlightNo.setText(job.getFlight());
+        mETA.setText(job.getETA());
         mPickup.setText(job.getPickUp());
         mDropOff.setText(job.getDestination());
         mRemarks.setText(job.getRemarks());
 
-        mItinerary.setVisibility((job.getFile1().isEmpty()) ? View.GONE : View.VISIBLE);
+        mItinerary.setVisibility((job.getFile1().isEmpty()) ? GONE : View.VISIBLE);
     }
 
     @OnClick(R.id.itinerary)
@@ -698,11 +885,13 @@ public class JobDetailFragment extends AbstractFragment {
     @OnClick(R.id.accept)
     public void acceptOnClick() {
         updateJobStatus("Confirm");
+        callUpdateDriverLocation();
     }
 
     @OnClick(R.id.reject)
     public void rejectOnClick() {
         updateJobStatus("Rejected");
+        callUpdateDriverLocation();
     }
 
     private void updateJobStatus(final String status) {
@@ -719,7 +908,7 @@ public class JobDetailFragment extends AbstractFragment {
             @Override
             public void onResponse(Call<JobRes> call, Response<JobRes> response) {
                 Log.e("Update Job Successful", response.toString());
-                mAssignLayout.setVisibility(View.GONE);
+                mAssignLayout.setVisibility(GONE);
                 mUpdateLayout.setVisibility(View.VISIBLE);
                 Toast.makeText(getContext(), "Update Successful", Toast.LENGTH_SHORT).show();
 
@@ -780,10 +969,10 @@ public class JobDetailFragment extends AbstractFragment {
 
 
         if (!hasGoogleMap())
-            mGoogleMap.setVisibility(View.GONE);
+            mGoogleMap.setVisibility(GONE);
 
         if (!hasWaze())
-            mWaze.setVisibility(View.GONE);
+            mWaze.setVisibility(GONE);
 
 
         //final String tmpAddress = "Silver Green Hotel, No.9 ANawYaHtar Road, Yangon";
@@ -858,7 +1047,7 @@ public class JobDetailFragment extends AbstractFragment {
                 App.location.getLongitude() + "&daddr=" +
                 address;
 
-        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
         intent.setPackage("com.google.android.apps.maps");
         startActivity(intent);
     }
@@ -873,7 +1062,7 @@ public class JobDetailFragment extends AbstractFragment {
                 location.getLongitude() +
                 "&navigate=yes";
 
-        Intent intent = new Intent(android.content.Intent.ACTION_VIEW, Uri.parse(uri));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
         intent.setPackage("com.waze");
         startActivity(intent);
     }
@@ -993,5 +1182,134 @@ public class JobDetailFragment extends AbstractFragment {
         }
 
     }
+
+
+    // Signature Related ==================================================
+    public void saveSignature(Bitmap photo) {
+        try {
+
+
+            photo = getResizedBitmap(photo, 400);
+
+            // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
+            Uri tempUri = getImageUri(getContext(), photo);
+
+            // CALL THIS METHOD TO GET THE ACTUAL PATH
+            File finalFile = new File(getRealPathFromURI(getContext(), tempUri));
+
+            InputStream inputStream = getContext().getContentResolver().openInputStream(tempUri);
+
+            FtpHelper.uploadTask async = new FtpHelper.uploadTask(getActivity(), inputStream);
+            async.execute(App.FTP_URL, App.FTP_USER, App.FTP_PASSWORD, App.FTP_DIR, job.getJobNo() + "_signature.jpg", job.getJobNo(), "SIGNATURE");   //Passing arguments to AsyncThread
+
+
+        } catch (Exception e) {
+            Log.e("FTP Error : ", e.getLocalizedMessage().toString());
+        }
+    }
+
+
+    public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[], @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length <= 0
+                        || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(getContext(), "Cannot write images to external storage", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }
+
+    public File getAlbumStorageDir(String albumName) {
+        // Get the directory for the user's public pictures directory.
+        File file = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), albumName);
+        if (!file.mkdirs()) {
+            Log.e("SignaturePad", "Directory not created");
+        }
+        return file;
+    }
+
+    public void saveBitmapToJPG(Bitmap bitmap, File photo) throws IOException {
+        Bitmap newBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(newBitmap);
+        canvas.drawColor(Color.WHITE);
+        canvas.drawBitmap(bitmap, 0, 0, null);
+        OutputStream stream = new FileOutputStream(photo);
+        newBitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream);
+        stream.close();
+    }
+
+    public boolean addJpgSignatureToGallery(Bitmap signature) {
+        boolean result = false;
+        try {
+            File photo = new File(getAlbumStorageDir("SignaturePad"), String.format("Signature_%d.jpg", System.currentTimeMillis()));
+            saveBitmapToJPG(signature, photo);
+            scanMediaFile(photo);
+            result = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    private void scanMediaFile(File photo) {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        Uri contentUri = Uri.fromFile(photo);
+        mediaScanIntent.setData(contentUri);
+        getContext().sendBroadcast(mediaScanIntent);
+    }
+
+    public boolean addSvgSignatureToGallery(String signatureSvg) {
+        boolean result = false;
+        try {
+            File svgFile = new File(getAlbumStorageDir("SignaturePad"), String.format("Signature_%d.svg", System.currentTimeMillis()));
+            OutputStream stream = new FileOutputStream(svgFile);
+            OutputStreamWriter writer = new OutputStreamWriter(stream);
+            writer.write(signatureSvg);
+            writer.close();
+            stream.flush();
+            stream.close();
+            scanMediaFile(svgFile);
+            result = true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
+    public static void verifyStoragePermissions(Activity activity) {
+        // Check if we have write permission
+        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
+            ActivityCompat.requestPermissions(
+                    activity,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE
+            );
+        }
+    }
+
 
 }

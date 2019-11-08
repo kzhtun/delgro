@@ -1,4 +1,4 @@
-package com.info121.mycoach.fragments;
+package com.info121.titalimo.fragments;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -20,13 +20,12 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
-import com.info121.mycoach.App;
-import com.info121.mycoach.R;
-import com.info121.mycoach.adapters.JobsAdapter;
-import com.info121.mycoach.api.RestClient;
-import com.info121.mycoach.models.Job;
-import com.info121.mycoach.models.JobRes;
-import com.info121.mycoach.utils.Util;
+import com.info121.titalimo.R;
+import com.info121.titalimo.adapters.JobsAdapter;
+import com.info121.titalimo.api.RestClient;
+import com.info121.titalimo.models.Job;
+import com.info121.titalimo.models.JobRes;
+import com.info121.titalimo.utils.Util;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -263,7 +262,7 @@ public class FutureHistoryFragment extends Fragment {
                     mNoData.setVisibility(View.VISIBLE);
 
                 // data refresh
-                jobsAdapter.updateJobList(mJobList);
+                jobsAdapter.updateJobList(mJobList, mCurrentTab);
                 mRecyclerView.getAdapter().notifyDataSetChanged();
 
             }
@@ -306,7 +305,7 @@ public class FutureHistoryFragment extends Fragment {
                     mNoData.setVisibility(View.VISIBLE);
 
                 // data refresh
-                jobsAdapter.updateJobList(mJobList);
+                jobsAdapter.updateJobList(mJobList, mCurrentTab);
                 mRecyclerView.getAdapter().notifyDataSetChanged();
 
             }

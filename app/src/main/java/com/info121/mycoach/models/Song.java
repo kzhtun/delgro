@@ -1,4 +1,4 @@
-package com.info121.mycoach.models;
+package com.info121.titalimo.models;
 
 /**
  * Created by KZHTUN on 1/29/2018.

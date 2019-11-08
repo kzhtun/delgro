@@ -1,4 +1,4 @@
-package com.info121.mycoach.models;
+package com.info121.titalimo.models;
 
 import com.google.gson.annotations.SerializedName;
 

@@ -1,15 +1,15 @@
-package com.info121.mycoach.activities;
+package com.info121.titalimo.activities;
 
 import android.content.Intent;
-import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.info121.mycoach.AbstractActivity;
-import com.info121.mycoach.App;
-import com.info121.mycoach.R;
-import com.info121.mycoach.adapters.JobDetailPageAdapter;
+import com.info121.titalimo.R;
+import com.info121.titalimo.AbstractActivity;
+import com.info121.titalimo.App;
+import com.info121.titalimo.adapters.JobDetailPageAdapter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

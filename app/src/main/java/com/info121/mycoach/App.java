@@ -1,4 +1,4 @@
-package com.info121.mycoach;
+package com.info121.titalimo;
 
 import android.app.Application;
 import android.content.Context;
@@ -16,8 +16,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
-import com.info121.mycoach.models.Job;
-import com.info121.mycoach.utils.PrefDB;
+import com.info121.titalimo.models.Job;
+import com.info121.titalimo.utils.PrefDB;
 
 
 import java.io.File;
@@ -54,6 +54,7 @@ public class App extends Application {
     public static long timerDelay = 60000;
     public static Location location;
     public static String fullAddress = "";
+    public static int gpsStatus = 0;
 
     public static Context targetContent;
 
@@ -100,9 +101,9 @@ public class App extends Application {
 
 
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                        .setDefaultFontPath("fonts/Lato-Regular.ttf")
-                       // .setFontAttrId(R.attr.fontPath)
-                        .build());
+                .setDefaultFontPath("fonts/Lato-Regular.ttf")
+                // .setFontAttrId(R.attr.fontPath)
+                .build());
 
 
         FirebaseInstanceId.getInstance().getInstanceId()

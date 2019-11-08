@@ -1,17 +1,16 @@
-package com.info121.mycoach.activities;
+package com.info121.titalimo.activities;
 
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,14 +20,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.info121.mycoach.AbstractActivity;
-import com.info121.mycoach.App;
-import com.info121.mycoach.R;
-import com.info121.mycoach.adapters.OverviewPageAdapter;
-import com.info121.mycoach.api.RestClient;
-import com.info121.mycoach.models.JobCount;
-import com.info121.mycoach.models.JobRes;
-import com.info121.mycoach.services.SmartLocationService;
+import com.info121.titalimo.R;
+import com.info121.titalimo.AbstractActivity;
+import com.info121.titalimo.App;
+import com.info121.titalimo.adapters.OverviewPageAdapter;
+import com.info121.titalimo.api.RestClient;
+import com.info121.titalimo.models.JobCount;
+import com.info121.titalimo.models.JobRes;
+import com.info121.titalimo.services.SmartLocationService;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

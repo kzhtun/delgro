@@ -1,4 +1,4 @@
-package com.info121.mycoach.services;
+package com.info121.titalimo.services;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -13,8 +13,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-
-import com.info121.mycoach.App;
+import com.info121.titalimo.App;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -137,6 +136,8 @@ public class SmartLocationService extends Service implements OnLocationUpdatedLi
             Log.e("GPS Status ... ", String.valueOf((isGpsEnabled()) ? 1 : 0) + "  ");
             Log.e("Date Time ... ", formattedDate);
 
+
+            App.gpsStatus = (isGpsEnabled()) ? 1 : 0;
 
             App.location = mLocation;
            // App.fullAddress = "Kyaw Thu 20St"; //getCompleteAddressString(mLocation);

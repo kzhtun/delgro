@@ -1,4 +1,4 @@
-package com.info121.mycoach.services;
+package com.info121.titalimo.services;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -12,12 +12,11 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
 import com.google.firebase.messaging.RemoteMessage;
-import com.info121.mycoach.App;
-import com.info121.mycoach.R;
-import com.info121.mycoach.activities.DialogActivity;
-import com.info121.mycoach.activities.JobOverviewActivity;
-import com.info121.mycoach.activities.MainActivity;
-import com.info121.mycoach.models.Action;
+import com.info121.titalimo.R;
+import com.info121.titalimo.App;
+import com.info121.titalimo.activities.DialogActivity;
+import com.info121.titalimo.activities.JobOverviewActivity;
+import com.info121.titalimo.models.Action;
 
 import org.greenrobot.eventbus.EventBus;
 

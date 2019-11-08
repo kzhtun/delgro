@@ -1,4 +1,4 @@
-package com.info121.mycoach;
+package com.info121.titalimo;
 
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;

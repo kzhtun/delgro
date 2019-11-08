@@ -1,11 +1,11 @@
-package com.info121.mycoach.adapters;
+package com.info121.titalimo.adapters;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.info121.mycoach.fragments.JobDetailFragment;
-import com.info121.mycoach.models.Job;
+import com.info121.titalimo.fragments.JobDetailFragment;
+import com.info121.titalimo.models.Job;
 
 import java.util.ArrayList;
 import java.util.List;

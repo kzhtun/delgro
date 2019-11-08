@@ -1,4 +1,4 @@
-package com.info121.mycoach.fragments;
+package com.info121.titalimo.fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -9,22 +9,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.info121.mycoach.AbstractFragment;
-import com.info121.mycoach.R;
-import com.info121.mycoach.adapters.JobsAdapter;
-import com.info121.mycoach.api.RestClient;
-import com.info121.mycoach.models.Action;
-import com.info121.mycoach.models.Job;
-import com.info121.mycoach.models.JobRes;
+import com.info121.titalimo.R;
+import com.info121.titalimo.AbstractFragment;
+import com.info121.titalimo.adapters.JobsAdapter;
+import com.info121.titalimo.api.RestClient;
+import com.info121.titalimo.models.Action;
+import com.info121.titalimo.models.Job;
+import com.info121.titalimo.models.JobRes;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
@@ -171,7 +169,7 @@ public class JobListFragment extends AbstractFragment {
                         mNoData.setVisibility(View.VISIBLE);
 
                 // data refresh
-                jobsAdapter.updateJobList(mJobList);
+                jobsAdapter.updateJobList(mJobList, mCurrentTab);
                 mRecyclerView.getAdapter().notifyDataSetChanged();
 
                 Toast.makeText(getContext(), "Today Jobs Updated", Toast.LENGTH_SHORT).show();
@@ -203,7 +201,7 @@ public class JobListFragment extends AbstractFragment {
                         mNoData.setVisibility(View.VISIBLE);
 
                 // data refresh
-                jobsAdapter.updateJobList(mJobList);
+                jobsAdapter.updateJobList(mJobList, mCurrentTab);
                 mRecyclerView.getAdapter().notifyDataSetChanged();
 
                 Toast.makeText(getContext(), "Tomorrow Jobs Updated", Toast.LENGTH_SHORT).show();

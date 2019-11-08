@@ -1,4 +1,4 @@
-package com.info121.mycoach.utils;
+package com.info121.titalimo.utils;
 
 /**
  * Created by KZHTUN on 1/29/2018.

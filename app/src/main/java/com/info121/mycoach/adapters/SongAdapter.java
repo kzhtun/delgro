@@ -1,4 +1,4 @@
-package com.info121.mycoach.adapters;
+package com.info121.titalimo.adapters;
 
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -10,11 +10,10 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.info121.mycoach.App;
-import com.info121.mycoach.R;
-import com.info121.mycoach.models.Song;
-import com.info121.mycoach.utils.PrefDB;
-
+import com.info121.titalimo.R;
+import com.info121.titalimo.App;
+import com.info121.titalimo.models.Song;
+import com.info121.titalimo.utils.PrefDB;
 
 import java.util.Date;
 import java.util.List;
