@@ -1,4 +1,4 @@
-package com.info121.titalimo.utils;
+package com.info121.mycoach.utils;
 
 /**
  * Created by KZHTUN on 1/29/2018.
@@ -14,8 +14,8 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.info121.titalimo.App;
-import com.info121.titalimo.models.Song;
+import com.info121.mycoach.App;
+import com.info121.mycoach.models.Song;
 
 import java.io.File;
 import java.util.ArrayList;

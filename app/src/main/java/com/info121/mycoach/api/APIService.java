@@ -1,8 +1,8 @@
-package com.info121.titalimo.api;
+package com.info121.mycoach.api;
 
 
-import com.info121.titalimo.models.JobRes;
-import com.info121.titalimo.models.ObjectRes;
+import com.info121.mycoach.models.JobRes;
+import com.info121.mycoach.models.ObjectRes;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

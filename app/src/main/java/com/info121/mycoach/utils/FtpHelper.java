@@ -1,4 +1,4 @@
-package com.info121.titalimo.utils;
+package com.info121.mycoach.utils;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -11,8 +11,8 @@ import android.provider.MediaStore;
 import android.widget.Toast;
 
 import com.adeel.library.easyFTP;
-import com.info121.titalimo.api.RestClient;
-import com.info121.titalimo.models.JobRes;
+import com.info121.mycoach.api.RestClient;
+import com.info121.mycoach.models.JobRes;
 
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;

@@ -1,4 +1,4 @@
-package com.info121.titalimo.models;
+package com.info121.mycoach.models;
 
 public class Action {
     private String action = "";

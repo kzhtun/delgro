@@ -1,4 +1,4 @@
-package com.info121.titalimo.adapters;
+package com.info121.mycoach.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,10 +12,10 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.info121.titalimo.R;
-import com.info121.titalimo.App;
-import com.info121.titalimo.activities.JobDetailActivity;
-import com.info121.titalimo.models.Job;
+import com.info121.mycoach.R;
+import com.info121.mycoach.App;
+import com.info121.mycoach.activities.JobDetailActivity;
+import com.info121.mycoach.models.Job;
 
 import java.util.ArrayList;
 import java.util.List;

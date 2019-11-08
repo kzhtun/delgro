@@ -1,4 +1,4 @@
-package com.info121.titalimo.activities;
+package com.info121.mycoach.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,11 +12,11 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
 
-import com.info121.titalimo.R;
-import com.info121.titalimo.adapters.SongAdapter;
-import com.info121.titalimo.models.Song;
-import com.info121.titalimo.utils.PrefDB;
-import com.info121.titalimo.utils.SongLoader;
+import com.info121.mycoach.R;
+import com.info121.mycoach.adapters.SongAdapter;
+import com.info121.mycoach.models.Song;
+import com.info121.mycoach.utils.PrefDB;
+import com.info121.mycoach.utils.SongLoader;
 
 import java.util.List;
 

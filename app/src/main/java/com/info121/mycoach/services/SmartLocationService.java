@@ -1,4 +1,4 @@
-package com.info121.titalimo.services;
+package com.info121.mycoach.services;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -13,7 +13,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.info121.titalimo.App;
+import com.info121.mycoach.App;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

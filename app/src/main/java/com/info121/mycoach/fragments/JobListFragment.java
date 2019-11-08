@@ -1,4 +1,4 @@
-package com.info121.titalimo.fragments;
+package com.info121.mycoach.fragments;
 
 import android.content.Context;
 import android.net.Uri;
@@ -15,13 +15,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.info121.titalimo.R;
-import com.info121.titalimo.AbstractFragment;
-import com.info121.titalimo.adapters.JobsAdapter;
-import com.info121.titalimo.api.RestClient;
-import com.info121.titalimo.models.Action;
-import com.info121.titalimo.models.Job;
-import com.info121.titalimo.models.JobRes;
+import com.info121.mycoach.R;
+import com.info121.mycoach.AbstractFragment;
+import com.info121.mycoach.adapters.JobsAdapter;
+import com.info121.mycoach.api.RestClient;
+import com.info121.mycoach.models.Action;
+import com.info121.mycoach.models.Job;
+import com.info121.mycoach.models.JobRes;
 
 import org.greenrobot.eventbus.Subscribe;
 

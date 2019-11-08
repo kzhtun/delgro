@@ -1,4 +1,4 @@
-package com.info121.titalimo.fragments;
+package com.info121.mycoach.fragments;
 
 import android.Manifest;
 import android.app.Activity;
@@ -39,16 +39,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.gcacace.signaturepad.views.SignaturePad;
-import com.info121.titalimo.R;
-import com.info121.titalimo.AbstractFragment;
-import com.info121.titalimo.App;
-import com.info121.titalimo.api.RestClient;
-import com.info121.titalimo.models.Action;
-import com.info121.titalimo.models.Job;
-import com.info121.titalimo.models.JobRes;
-import com.info121.titalimo.utils.FtpHelper;
-import com.info121.titalimo.utils.GeocodingLocation;
-import com.info121.titalimo.utils.Util;
+import com.info121.mycoach.R;
+import com.info121.mycoach.AbstractFragment;
+import com.info121.mycoach.App;
+import com.info121.mycoach.api.RestClient;
+import com.info121.mycoach.models.Action;
+import com.info121.mycoach.models.Job;
+import com.info121.mycoach.models.JobRes;
+import com.info121.mycoach.utils.FtpHelper;
+import com.info121.mycoach.utils.GeocodingLocation;
+import com.info121.mycoach.utils.Util;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -72,8 +72,8 @@ import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
 import static android.view.View.GONE;
-import static com.info121.titalimo.utils.FtpHelper.getImageUri;
-import static com.info121.titalimo.utils.FtpHelper.getRealPathFromURI;
+import static com.info121.mycoach.utils.FtpHelper.getImageUri;
+import static com.info121.mycoach.utils.FtpHelper.getRealPathFromURI;
 
 
 public class JobDetailFragment extends AbstractFragment {

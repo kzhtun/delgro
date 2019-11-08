@@ -1,4 +1,4 @@
-package com.info121.titalimo.utils;
+package com.info121.mycoach.utils;
 
 import android.content.ClipData;
 import android.content.ClipboardManager;

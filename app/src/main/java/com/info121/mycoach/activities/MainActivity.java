@@ -1,4 +1,4 @@
-package com.info121.titalimo.activities;
+package com.info121.mycoach.activities;
 
 import android.Manifest;
 import android.content.Context;
@@ -10,7 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 
-import com.info121.titalimo.R;
+import com.info121.mycoach.R;
 
 public class MainActivity extends AppCompatActivity {
 

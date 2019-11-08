@@ -1,4 +1,4 @@
-package com.info121.titalimo;
+package com.info121.mycoach;
 
 import android.app.Application;
 import android.content.Context;
@@ -16,8 +16,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
-import com.info121.titalimo.models.Job;
-import com.info121.titalimo.utils.PrefDB;
+import com.info121.mycoach.models.Job;
+import com.info121.mycoach.utils.PrefDB;
 
 
 import java.io.File;

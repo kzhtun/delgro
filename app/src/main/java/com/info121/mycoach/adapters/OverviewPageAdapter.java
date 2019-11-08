@@ -1,4 +1,4 @@
-package com.info121.titalimo.adapters;
+package com.info121.mycoach.adapters;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -6,8 +6,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.util.Log;
 
-import com.info121.titalimo.fragments.FutureHistoryFragment;
-import com.info121.titalimo.fragments.JobListFragment;
+import com.info121.mycoach.fragments.FutureHistoryFragment;
+import com.info121.mycoach.fragments.JobListFragment;
 
 public class OverviewPageAdapter extends FragmentStatePagerAdapter {
 

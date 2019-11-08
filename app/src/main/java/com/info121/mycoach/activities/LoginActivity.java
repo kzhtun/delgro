@@ -1,4 +1,4 @@
-package com.info121.titalimo.activities;
+package com.info121.mycoach.activities;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,16 +20,16 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.info121.titalimo.AbstractActivity;
-import com.info121.titalimo.App;
-import com.info121.titalimo.R;
-import com.info121.titalimo.activities.JobOverviewActivity;
-import com.info121.titalimo.api.RestClient;
-import com.info121.titalimo.models.ObjectRes;
-import com.info121.titalimo.services.SmartLocationService;
-import com.info121.titalimo.utils.GeocodingLocation;
-import com.info121.titalimo.utils.PrefDB;
-import com.info121.titalimo.utils.Util;
+import com.info121.mycoach.AbstractActivity;
+import com.info121.mycoach.App;
+import com.info121.mycoach.R;
+import com.info121.mycoach.activities.JobOverviewActivity;
+import com.info121.mycoach.api.RestClient;
+import com.info121.mycoach.models.ObjectRes;
+import com.info121.mycoach.services.SmartLocationService;
+import com.info121.mycoach.utils.GeocodingLocation;
+import com.info121.mycoach.utils.PrefDB;
+import com.info121.mycoach.utils.Util;
 
 import java.io.IOException;
 import java.util.List;

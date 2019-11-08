@@ -1,4 +1,4 @@
-package com.info121.titalimo.activities;
+package com.info121.mycoach.activities;
 
 import android.app.Dialog;
 import android.content.Context;
@@ -20,14 +20,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.info121.titalimo.R;
-import com.info121.titalimo.AbstractActivity;
-import com.info121.titalimo.App;
-import com.info121.titalimo.adapters.OverviewPageAdapter;
-import com.info121.titalimo.api.RestClient;
-import com.info121.titalimo.models.JobCount;
-import com.info121.titalimo.models.JobRes;
-import com.info121.titalimo.services.SmartLocationService;
+import com.info121.mycoach.R;
+import com.info121.mycoach.AbstractActivity;
+import com.info121.mycoach.App;
+import com.info121.mycoach.adapters.OverviewPageAdapter;
+import com.info121.mycoach.api.RestClient;
+import com.info121.mycoach.models.JobCount;
+import com.info121.mycoach.models.JobRes;
+import com.info121.mycoach.services.SmartLocationService;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
